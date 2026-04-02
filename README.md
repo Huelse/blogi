@@ -2,6 +2,6 @@
 
 ## 技术栈
 
-Server：JDK 21, Spring Boot 4, Spring Data JPA, PostgreSQL, Redis, Spring Security 7, JWT
+Server：JDK 25, Spring Boot 4, PostgreSQL, HikariCP, MyBatis-Plus, Redis, Spring Security 7, JWT
 
-client: Vue 3, TypeScript, Milkdown
+Client: Vue 3, Pinia, Nuxt, TypeScript, Milkdown, Tailwind, Element Plus (管理后台)
