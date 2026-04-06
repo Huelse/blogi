@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: blogi-server
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB:blogi}
+    username: ${POSTGRES_USER:blogi}
+    password: ${POSTGRES_PASSWORD:blogi}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+  data:
+    redis:
+      host: localhost
+      port: ${REDIS_PORT:6379}
+
+server:
+  port: 8080
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+blogi:
+  security:
+    jwt-secret: ${JWT_SECRET:change-me-to-a-long-random-string}
+    jwt-expiration-seconds: ${JWT_EXPIRATION:86400}
