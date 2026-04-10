@@ -7,7 +7,101 @@
     color-scheme: dark;
   }
 
+  html {
+    @apply bg-stone-950;
+  }
+
   body {
     font-family: "IBM Plex Sans", sans-serif;
+    @apply bg-stone-950 text-stone-100 antialiased;
+  }
+
+  a {
+    @apply transition-colors;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+@layer components {
+  .bg-ink {
+    background:
+      radial-gradient(circle at top, rgba(245, 158, 11, 0.12), transparent 30%),
+      linear-gradient(180deg, #111111 0%, #0a0a0a 100%);
+  }
+
+  .panel {
+    @apply rounded-[28px] border border-white/10 bg-white/5 shadow-2xl shadow-black/20 backdrop-blur;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-stone-100 outline-none transition placeholder:text-stone-500 focus:border-amber-300/60 focus:ring-2 focus:ring-amber-300/20;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-amber-300 px-5 py-3 text-sm font-medium text-stone-950 transition hover:bg-amber-200;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-full border border-white/15 px-5 py-3 text-sm font-medium text-stone-100 transition hover:border-white/30 hover:bg-white/5;
+  }
+
+  .prose-blog {
+    @apply max-w-none space-y-6 text-base leading-8 text-stone-200;
+  }
+
+  .prose-blog h1,
+  .prose-blog h2,
+  .prose-blog h3 {
+    @apply font-semibold tracking-tight text-white;
+  }
+
+  .prose-blog h1 {
+    @apply text-4xl;
+  }
+
+  .prose-blog h2 {
+    @apply text-3xl;
+  }
+
+  .prose-blog h3 {
+    @apply text-2xl;
+  }
+
+  .prose-blog p,
+  .prose-blog ul,
+  .prose-blog ol,
+  .prose-blog blockquote {
+    @apply my-4;
+  }
+
+  .prose-blog ul {
+    @apply list-disc pl-6;
+  }
+
+  .prose-blog ol {
+    @apply list-decimal pl-6;
+  }
+
+  .prose-blog code {
+    @apply rounded bg-white/10 px-1.5 py-1 text-sm text-amber-100;
+  }
+
+  .prose-blog pre {
+    @apply overflow-x-auto rounded-3xl border border-white/10 bg-black/35 p-5;
+  }
+
+  .prose-blog pre code {
+    @apply bg-transparent p-0 text-stone-100;
+  }
+
+  .prose-blog blockquote {
+    @apply border-l-4 border-amber-300/60 pl-4 italic text-stone-300;
+  }
+
+  .prose-blog a {
+    @apply text-amber-300 underline decoration-amber-300/40 underline-offset-4;
   }
 }

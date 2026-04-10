@@ -71,7 +71,7 @@ mvn spring-boot:run
 
 ## TODO
 
-- [ ] 用户注册 / 登录 + JWT + 文章 CRUD + Markdown 展示
+- [x] 用户注册 / 登录 + JWT + 文章 CRUD + Markdown 展示
 - [ ] 评论功能 + 文章分类
 - [ ] 前端 Vue 3 接入 + 路由守卫
 - [ ] 文件上传（头像 / 封面）
