@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "pnpm --filter client dev",
     "build": "pnpm --filter client build",
-    "lint": "pnpm --filter client lint"
+    "lint": "pnpm --filter client lint",
+    "test": "pnpm --filter client test",
+    "test:unit": "pnpm --filter client test:unit",
+    "test:nuxt": "pnpm --filter client test:nuxt"
   }
 }

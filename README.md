@@ -47,6 +47,16 @@ cp .env.example .env
 pnpm install
 ```
 
+### 3.1. 运行前端测试
+
+项目已接入 Nuxt 官方测试方案 `Vitest + @nuxt/test-utils`。
+
+```bash
+pnpm test
+pnpm test:unit
+pnpm test:nuxt
+```
+
 ### 4. 启动基础服务
 
 ```bash
