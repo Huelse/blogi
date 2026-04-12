@@ -60,7 +60,7 @@ pnpm test:nuxt
 ### 4. 启动基础服务
 
 ```bash
-docker compose up -d
+pnpm dev:infra
 ```
 
 ### 5. 启动项目
@@ -74,9 +74,10 @@ pnpm dev
 后端：
 
 ```bash
-cd server
-mvn spring-boot:run
+pnpm dev:server
 ```
+
+`pnpm dev:server` 会自动加载仓库根目录 `.env` 中的数据库、Redis 和 JWT 配置。
 
 ## 当前初始化内容
 
@@ -94,3 +95,9 @@ mvn spring-boot:run
 - [ ] 后台管理 + 插件与主题
 - [ ] 游客快捷登录留言（浏览器指纹）
 - [ ] AI 搜索
+
+第一个 TODO 已完成，当前仓库已包含：
+
+- `/api/auth/register`、`/api/auth/login`、JWT 鉴权
+- `/api/posts` 相关创建、编辑、删除、详情与列表接口
+- 前端注册、登录、发文、编辑与 Markdown 渲染页面

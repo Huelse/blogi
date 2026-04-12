@@ -4,6 +4,8 @@
   "packageManager": "pnpm@10.32.1",
   "scripts": {
     "dev": "pnpm --filter client dev",
+    "dev:infra": "docker compose up -d",
+    "dev:server": "bash -lc 'set -a; [ -f .env ] && source .env; set +a; mvn -f server/pom.xml spring-boot:run'",
     "build": "pnpm --filter client build",
     "lint": "pnpm --filter client lint",
     "test": "pnpm --filter client test",
