@@ -36,6 +36,11 @@ Docker Compose 启动基础服务
 cp .env.example .env
 ```
 
+默认可配置以下连接信息：
+
+- `POSTGRES_HOST` / `POSTGRES_PORT` / `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD`
+- `REDIS_HOST` / `REDIS_PORT` / `REDIS_PASSWORD`
+
 ### 3. 安装前端依赖
 
 ```bash

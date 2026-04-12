@@ -16,6 +16,7 @@ services:
     image: redis:8-alpine
     container_name: blogi-redis
     restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-blogi}"]
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
