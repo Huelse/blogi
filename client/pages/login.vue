@@ -37,24 +37,22 @@ async function submit() {
 <template>
   <main class="mx-auto max-w-xl px-6 py-16">
     <section class="panel p-8">
-      <p class="text-sm uppercase tracking-[0.3em] text-amber-300">Login</p>
-      <h1 class="mt-4 text-3xl font-semibold text-white">登录 Blogi</h1>
-      <p class="mt-3 text-sm leading-7 text-stone-400">使用用户名和密码换取 JWT，后续写作请求会自动附带认证头。</p>
+      <p class="text-brand text-sm uppercase tracking-[0.3em]">Login</p>
+      <h1 class="text-title mt-4 text-3xl font-semibold">登录 Blogi</h1>
+      <p class="text-muted mt-3 text-sm leading-7">使用用户名和密码换取 JWT，后续写作请求会自动附带认证头。</p>
 
       <form class="mt-8 space-y-5" @submit.prevent="submit">
         <div>
-          <label class="mb-2 block text-sm text-stone-300" for="username">用户名</label>
+          <label class="text-body mb-2 block text-sm" for="username">用户名</label>
           <input id="username" v-model="form.username" class="field" required type="text">
         </div>
 
         <div>
-          <label class="mb-2 block text-sm text-stone-300" for="password">密码</label>
+          <label class="text-body mb-2 block text-sm" for="password">密码</label>
           <input id="password" v-model="form.password" class="field" required type="password">
         </div>
 
-        <p v-if="errorMessage" class="rounded-2xl border border-rose-300/20 bg-rose-300/10 px-4 py-3 text-sm text-rose-100">
-          {{ errorMessage }}
-        </p>
+        <p v-if="errorMessage" class="alert-danger">{{ errorMessage }}</p>
 
         <div class="flex flex-wrap gap-3">
           <button class="btn-primary" :disabled="pending" type="submit">

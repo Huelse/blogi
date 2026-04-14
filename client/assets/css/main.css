@@ -3,15 +3,81 @@
 @layer base {
   :root {
     color-scheme: dark;
+    --app-bg: #0c0a09;
+    --title: #fafaf9;
+    --body: #d6d3d1;
+    --muted: #a8a29e;
+    --subtle: #78716c;
+    --brand: #fbbf24;
+    --brand-soft: rgba(251, 191, 36, 0.14);
+    --brand-border: rgba(251, 191, 36, 0.22);
+    --panel-bg: rgba(255, 255, 255, 0.05);
+    --panel-soft-bg: rgba(0, 0, 0, 0.22);
+    --panel-border: rgba(255, 255, 255, 0.1);
+    --panel-shadow: rgba(0, 0, 0, 0.22);
+    --field-bg: rgba(0, 0, 0, 0.22);
+    --field-placeholder: #78716c;
+    --nav-bg: rgba(0, 0, 0, 0.2);
+    --nav-border: rgba(255, 255, 255, 0.1);
+    --secondary-bg-hover: rgba(255, 255, 255, 0.05);
+    --secondary-border: rgba(255, 255, 255, 0.15);
+    --secondary-border-hover: rgba(255, 255, 255, 0.28);
+    --primary-bg: #fcd34d;
+    --primary-bg-hover: #fde68a;
+    --primary-text: #1c1917;
+    --accent-link: #fcd34d;
+    --danger-text: #fecaca;
+    --danger-border: rgba(252, 165, 165, 0.24);
+    --danger-bg: rgba(239, 68, 68, 0.12);
+    --app-glow-top: rgba(245, 158, 11, 0.16);
+    --app-glow-bottom: rgba(251, 191, 36, 0.1);
+    --ink-gradient:
+      radial-gradient(circle at top, rgba(245, 158, 11, 0.14), transparent 30%),
+      linear-gradient(180deg, #111111 0%, #0a0a0a 100%);
+  }
+
+  [data-theme='light'] {
+    color-scheme: light;
+    --app-bg: #f8f5ef;
+    --title: #1c1917;
+    --body: #44403c;
+    --muted: #57534e;
+    --subtle: #a8a29e;
+    --brand: #b45309;
+    --brand-soft: rgba(217, 119, 6, 0.12);
+    --brand-border: rgba(217, 119, 6, 0.22);
+    --panel-bg: rgba(255, 255, 255, 0.82);
+    --panel-soft-bg: rgba(255, 255, 255, 0.7);
+    --panel-border: rgba(120, 113, 108, 0.14);
+    --panel-shadow: rgba(148, 163, 184, 0.16);
+    --field-bg: rgba(255, 255, 255, 0.92);
+    --field-placeholder: #a8a29e;
+    --nav-bg: rgba(248, 245, 239, 0.82);
+    --nav-border: rgba(120, 113, 108, 0.15);
+    --secondary-bg-hover: rgba(255, 255, 255, 0.72);
+    --secondary-border: rgba(120, 113, 108, 0.18);
+    --secondary-border-hover: rgba(120, 113, 108, 0.28);
+    --primary-bg: #d97706;
+    --primary-bg-hover: #f59e0b;
+    --primary-text: #ffffff;
+    --accent-link: #b45309;
+    --danger-text: #b91c1c;
+    --danger-border: rgba(220, 38, 38, 0.18);
+    --danger-bg: rgba(254, 226, 226, 0.9);
+    --app-glow-top: rgba(245, 158, 11, 0.12);
+    --app-glow-bottom: rgba(251, 191, 36, 0.08);
+    --ink-gradient:
+      radial-gradient(circle at top, rgba(245, 158, 11, 0.12), transparent 30%),
+      linear-gradient(180deg, #faf6ee 0%, #f2ece2 100%);
   }
 
   html {
-    @apply bg-stone-950;
+    background: #0c0a09;
   }
 
   body {
     font-family: "IBM Plex Sans", sans-serif;
-    @apply bg-stone-950 text-stone-100 antialiased;
+    @apply antialiased;
   }
 
   a {
@@ -24,36 +90,185 @@
 }
 
 @layer components {
-  .bg-ink {
+  .app-shell {
+    background: var(--app-bg);
+    color: var(--body);
+    transition:
+      background-color 180ms ease,
+      color 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .app-glow {
     background:
-      radial-gradient(circle at top, rgba(245, 158, 11, 0.12), transparent 30%),
-      linear-gradient(180deg, #111111 0%, #0a0a0a 100%);
+      radial-gradient(circle at top, var(--app-glow-top), transparent 32%),
+      radial-gradient(circle at bottom right, var(--app-glow-bottom), transparent 28%);
+  }
+
+  .bg-ink {
+    background: var(--ink-gradient);
+  }
+
+  .surface-nav {
+    @apply border-b backdrop-blur;
+    border-color: var(--nav-border);
+    background: var(--nav-bg);
   }
 
   .panel {
-    @apply rounded-[28px] border border-white/10 bg-white/5 shadow-2xl shadow-black/20 backdrop-blur;
+    @apply rounded-[28px] backdrop-blur;
+    border: 1px solid var(--panel-border);
+    background: var(--panel-bg);
+    box-shadow: 0 32px 80px -40px var(--panel-shadow);
+  }
+
+  .panel-soft {
+    @apply rounded-[24px];
+    border: 1px solid var(--panel-border);
+    background: var(--panel-soft-bg);
+  }
+
+  .panel-accent {
+    @apply rounded-[24px];
+    border: 1px solid var(--brand-border);
+    background: var(--brand-soft);
   }
 
   .field {
-    @apply w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-stone-100 outline-none transition placeholder:text-stone-500 focus:border-amber-300/60 focus:ring-2 focus:ring-amber-300/20;
+    @apply w-full rounded-2xl px-4 py-3 text-sm outline-none transition;
+    border: 1px solid var(--panel-border);
+    background: var(--field-bg);
+    color: var(--title);
+  }
+
+  .field::placeholder {
+    color: var(--field-placeholder);
+  }
+
+  .field:focus {
+    border-color: color-mix(in srgb, var(--brand) 55%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 16%, transparent);
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .icon-button,
+  .user-chip {
+    @apply inline-flex items-center justify-center rounded-full text-sm font-medium transition;
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-amber-300 px-5 py-3 text-sm font-medium text-stone-950 transition hover:bg-amber-200;
+    @apply px-5 py-3;
+    background: var(--primary-bg);
+    color: var(--primary-text);
   }
 
-  .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-full border border-white/15 px-5 py-3 text-sm font-medium text-stone-100 transition hover:border-white/30 hover:bg-white/5;
+  .btn-primary:hover {
+    background: var(--primary-bg-hover);
+  }
+
+  .btn-secondary,
+  .btn-danger,
+  .icon-button,
+  .user-chip {
+    border: 1px solid var(--secondary-border);
+    color: var(--title);
+  }
+
+  .btn-secondary,
+  .btn-danger {
+    @apply px-5 py-3;
+  }
+
+  .btn-secondary:hover,
+  .btn-danger:hover,
+  .icon-button:hover {
+    border-color: var(--secondary-border-hover);
+    background: var(--secondary-bg-hover);
+  }
+
+  .btn-danger {
+    color: var(--danger-text);
+    border-color: var(--danger-border);
+  }
+
+  .icon-button {
+    @apply h-11 px-4;
+  }
+
+  .user-chip {
+    @apply hidden px-4 py-2 md:inline-flex;
+    background: color-mix(in srgb, var(--panel-bg) 70%, transparent);
+    color: var(--muted);
+  }
+
+  .brand-link {
+    color: var(--brand);
+  }
+
+  .nav-link {
+    color: var(--muted);
+  }
+
+  .nav-link:hover {
+    color: var(--title);
+  }
+
+  .text-title {
+    color: var(--title);
+  }
+
+  .text-body {
+    color: var(--body);
+  }
+
+  .text-muted {
+    color: var(--muted);
+  }
+
+  .text-subtle {
+    color: var(--subtle);
+  }
+
+  .text-brand {
+    color: var(--brand);
+  }
+
+  .text-danger {
+    color: var(--danger-text);
+  }
+
+  .meta-row {
+    @apply flex flex-wrap items-center gap-x-4 gap-y-2 text-xs uppercase tracking-[0.24em];
+    color: var(--subtle);
+  }
+
+  .alert-danger {
+    @apply rounded-2xl px-4 py-3 text-sm;
+    border: 1px solid var(--danger-border);
+    background: var(--danger-bg);
+    color: var(--danger-text);
+  }
+
+  .accent-link {
+    color: var(--accent-link);
+  }
+
+  .accent-link:hover {
+    color: color-mix(in srgb, var(--accent-link) 82%, white);
   }
 
   .prose-blog {
-    @apply max-w-none space-y-6 text-base leading-8 text-stone-200;
+    @apply max-w-none space-y-6 text-base leading-8;
+    color: var(--body);
   }
 
   .prose-blog h1,
   .prose-blog h2,
   .prose-blog h3 {
-    @apply font-semibold tracking-tight text-white;
+    @apply font-semibold tracking-tight;
+    color: var(--title);
   }
 
   .prose-blog h1 {
@@ -84,22 +299,32 @@
   }
 
   .prose-blog code {
-    @apply rounded bg-white/10 px-1.5 py-1 text-sm text-amber-100;
+    @apply rounded px-1.5 py-1 text-sm;
+    background: color-mix(in srgb, var(--panel-bg) 85%, transparent);
+    color: color-mix(in srgb, var(--brand) 80%, white);
   }
 
   .prose-blog pre {
-    @apply overflow-x-auto rounded-3xl border border-white/10 bg-black/35 p-5;
+    @apply overflow-x-auto rounded-3xl p-5;
+    border: 1px solid var(--panel-border);
+    background: color-mix(in srgb, var(--panel-soft-bg) 95%, transparent);
   }
 
   .prose-blog pre code {
-    @apply bg-transparent p-0 text-stone-100;
+    @apply p-0;
+    background: transparent;
+    color: var(--title);
   }
 
   .prose-blog blockquote {
-    @apply border-l-4 border-amber-300/60 pl-4 italic text-stone-300;
+    @apply border-l-4 pl-4 italic;
+    border-color: color-mix(in srgb, var(--brand) 60%, transparent);
+    color: var(--muted);
   }
 
   .prose-blog a {
-    @apply text-amber-300 underline decoration-amber-300/40 underline-offset-4;
+    @apply underline underline-offset-4;
+    color: var(--accent-link);
+    text-decoration-color: color-mix(in srgb, var(--accent-link) 40%, transparent);
   }
 }

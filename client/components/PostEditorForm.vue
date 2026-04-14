@@ -43,19 +43,19 @@ function submit() {
 <template>
   <section class="panel p-8">
     <div class="max-w-2xl">
-      <p class="text-sm uppercase tracking-[0.3em] text-amber-300">{{ title }}</p>
-      <p class="mt-4 text-sm leading-7 text-stone-400">{{ description }}</p>
+      <p class="text-brand text-sm uppercase tracking-[0.3em]">{{ title }}</p>
+      <p class="text-muted mt-4 text-sm leading-7">{{ description }}</p>
     </div>
 
     <form class="mt-8 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]" @submit.prevent="submit">
       <div class="space-y-5">
         <div>
-          <label class="mb-2 block text-sm text-stone-300" for="title">标题</label>
+          <label class="text-body mb-2 block text-sm" for="title">标题</label>
           <input id="title" v-model="form.title" class="field" maxlength="120" required type="text">
         </div>
 
         <div>
-          <label class="mb-2 block text-sm text-stone-300" for="summary">摘要</label>
+          <label class="text-body mb-2 block text-sm" for="summary">摘要</label>
           <textarea
             id="summary"
             v-model="form.summary"
@@ -66,7 +66,7 @@ function submit() {
         </div>
 
         <div>
-          <label class="mb-2 block text-sm text-stone-300" for="content">Markdown 正文</label>
+          <label class="text-body mb-2 block text-sm" for="content">Markdown 正文</label>
           <textarea
             id="content"
             v-model="form.contentMarkdown"
@@ -84,8 +84,8 @@ function submit() {
         </div>
       </div>
 
-      <div class="rounded-[24px] border border-white/10 bg-black/25 p-6">
-        <p class="text-sm uppercase tracking-[0.24em] text-stone-500">Preview</p>
+      <div class="panel-soft p-6">
+        <p class="text-subtle text-sm uppercase tracking-[0.24em]">Preview</p>
         <!-- eslint-disable-next-line vue/no-v-html -->
         <article class="prose-blog mt-6" v-html="previewHtml" />
       </div>

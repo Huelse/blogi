@@ -43,14 +43,9 @@ async function save(payload: PostPayload) {
 
 <template>
   <main class="mx-auto max-w-6xl px-6 py-16">
-    <div v-if="error || !post" class="panel px-6 py-8 text-rose-100">无法加载待编辑文章。</div>
+    <div v-if="error || !post" class="panel px-6 py-8 text-danger">无法加载待编辑文章。</div>
     <template v-else>
-      <p
-        v-if="errorMessage"
-        class="mb-6 rounded-2xl border border-rose-300/20 bg-rose-300/10 px-4 py-3 text-sm text-rose-100"
-      >
-        {{ errorMessage }}
-      </p>
+      <p v-if="errorMessage" class="alert-danger mb-6">{{ errorMessage }}</p>
 
       <PostEditorForm
         description="只有作者本人可以更新内容。保存后会覆盖原文，并刷新详情页展示。"
