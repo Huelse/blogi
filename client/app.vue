@@ -20,9 +20,9 @@ function logout() {
         </NuxtLink>
 
         <div class="flex items-center gap-2 text-sm sm:gap-3">
-          <NuxtLink class="nav-link hidden sm:inline-flex" to="/">首页</NuxtLink>
+          <NuxtLink class="btn-secondary hidden sm:inline-flex" to="/">首页</NuxtLink>
           <button
-            class="icon-button"
+            class="btn-secondary"
             :aria-label="theme.isDark.value ? '切换到明亮主题' : '切换到黑暗主题'"
             type="button"
             @click="theme.toggleTheme()"
@@ -41,7 +41,7 @@ function logout() {
             <button class="btn-secondary" type="button" @click="logout">退出</button>
           </template>
           <template v-else>
-            <NuxtLink class="nav-link hidden sm:inline-flex" to="/register">注册</NuxtLink>
+            <NuxtLink class="btn-secondary hidden sm:inline-flex" to="/register">注册</NuxtLink>
             <NuxtLink class="btn-primary" to="/login">登录</NuxtLink>
           </template>
         </div>
