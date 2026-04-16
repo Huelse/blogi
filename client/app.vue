@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { buttonVariants } from '~/components/ui/button/buttonVariants'
+
 const auth = useAuth()
 const theme = useTheme()
 
 const nextThemeLabel = computed(() => theme.isDark.value ? '浅色' : '深色')
 
-function logout() {
+async function logout() {
   auth.clearSession()
-  navigateTo('/')
+  await navigateTo('/')
 }
 </script>
 
@@ -20,29 +22,38 @@ function logout() {
         </NuxtLink>
 
         <div class="flex items-center gap-2 text-sm sm:gap-3">
-          <NuxtLink class="btn-secondary hidden sm:inline-flex" to="/">首页</NuxtLink>
-          <button
-            class="btn-secondary"
+          <NuxtLink :class="buttonVariants({ variant: 'secondary', size: 'sm' })" class="hidden sm:inline-flex" to="/">
+            首页
+          </NuxtLink>
+          <UiButton
+            size="sm"
+            variant="secondary"
             :aria-label="theme.isDark.value ? '切换到明亮主题' : '切换到黑暗主题'"
             type="button"
             @click="theme.toggleTheme()"
           >
             {{ nextThemeLabel }}
-          </button>
+          </UiButton>
           <NuxtLink
             v-if="auth.isAuthenticated.value"
-            class="btn-secondary"
+            :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
             to="/posts/new"
           >
             写文章
           </NuxtLink>
-          <template v-if="auth.user.value">
-            <span class="user-chip">{{ auth.user.value.displayName }}</span>
-            <button class="btn-secondary" type="button" @click="logout">退出</button>
+          <template v-if="auth.isAuthenticated.value && auth.user.value">
+            <UiBadge class="hidden md:inline-flex" variant="muted">{{ auth.user.value.displayName }}</UiBadge>
+            <UiButton size="sm" variant="secondary" type="button" @click="logout">退出</UiButton>
           </template>
           <template v-else>
-            <NuxtLink class="btn-secondary hidden sm:inline-flex" to="/register">注册</NuxtLink>
-            <NuxtLink class="btn-primary" to="/login">登录</NuxtLink>
+            <NuxtLink
+              :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
+              class="hidden sm:inline-flex"
+              to="/register"
+            >
+              注册
+            </NuxtLink>
+            <NuxtLink :class="buttonVariants({ size: 'sm' })" to="/login">登录</NuxtLink>
           </template>
         </div>
       </nav>

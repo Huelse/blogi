@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PostPayload } from '~/types/blogi'
+import { buttonVariants } from '~/components/ui/button/buttonVariants'
 import { renderMarkdown } from '~/utils/markdown'
 
 const props = withDefaults(defineProps<{
@@ -41,7 +42,7 @@ function submit() {
 </script>
 
 <template>
-  <section class="panel p-8">
+  <UiCard class="p-8">
     <div class="max-w-2xl">
       <p class="text-brand text-sm uppercase tracking-[0.3em]">{{ title }}</p>
       <p class="text-muted mt-4 text-sm leading-7">{{ description }}</p>
@@ -50,45 +51,45 @@ function submit() {
     <form class="mt-8 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]" @submit.prevent="submit">
       <div class="space-y-5">
         <div>
-          <label class="text-body mb-2 block text-sm" for="title">标题</label>
-          <input id="title" v-model="form.title" class="field" maxlength="120" required type="text">
+          <UiLabel for="title">标题</UiLabel>
+          <UiInput id="title" v-model="form.title" maxlength="120" required type="text" />
         </div>
 
         <div>
-          <label class="text-body mb-2 block text-sm" for="summary">摘要</label>
-          <textarea
+          <UiLabel for="summary">摘要</UiLabel>
+          <UiTextarea
             id="summary"
             v-model="form.summary"
-            class="field min-h-[110px]"
+            class="min-h-[110px]"
             maxlength="280"
             placeholder="可选，不填时后端会从正文自动生成摘要"
           />
         </div>
 
         <div>
-          <label class="text-body mb-2 block text-sm" for="content">Markdown 正文</label>
-          <textarea
+          <UiLabel for="content">Markdown 正文</UiLabel>
+          <UiTextarea
             id="content"
             v-model="form.contentMarkdown"
-            class="field min-h-[380px] font-mono text-[13px] leading-7"
+            class="min-h-[380px] font-mono text-[13px] leading-7"
             placeholder="# 标题"
             required
           />
         </div>
 
         <div class="flex flex-wrap gap-3">
-          <button class="btn-primary" :disabled="submitting" type="submit">
+          <UiButton :disabled="submitting" type="submit">
             {{ submitting ? '提交中...' : submitLabel }}
-          </button>
-          <NuxtLink class="btn-secondary" to="/">返回列表</NuxtLink>
+          </UiButton>
+          <NuxtLink :class="buttonVariants({ variant: 'secondary' })" to="/">返回列表</NuxtLink>
         </div>
       </div>
 
-      <div class="panel-soft p-6">
+      <UiCard class="p-6" tone="soft">
         <p class="text-subtle text-sm uppercase tracking-[0.24em]">Preview</p>
         <!-- eslint-disable-next-line vue/no-v-html -->
         <article class="prose-blog mt-6" v-html="previewHtml" />
-      </div>
+      </UiCard>
     </form>
-  </section>
+  </UiCard>
 </template>

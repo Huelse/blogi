@@ -1,5 +1,6 @@
 import type { FetchOptions } from 'ofetch'
 import type { ApiEnvelope } from '~/types/blogi'
+import { getStatusCode } from '~/utils/http'
 
 export function useApiClient() {
   const config = useRuntimeConfig()
@@ -11,12 +12,20 @@ export function useApiClient() {
       ...((options.headers as Record<string, string> | undefined) ?? {})
     }
 
-    const response = await $fetch<ApiEnvelope<T>>(path, {
-      baseURL: config.public.apiBase,
-      ...options,
-      headers
-    })
+    try {
+      const response = await $fetch<ApiEnvelope<T>>(path, {
+        baseURL: config.public.apiBase,
+        ...options,
+        headers
+      })
 
-    return response.data
+      return response.data
+    } catch (error) {
+      if (getStatusCode(error) === 401) {
+        auth.clearSession()
+      }
+
+      throw error
+    }
   }
 }

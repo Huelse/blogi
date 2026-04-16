@@ -13,8 +13,12 @@
     "test:nuxt": "vitest run --project nuxt"
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "markdown-it": "^14.1.1",
     "nuxt": "^4.0.0",
+    "shadcn-nuxt": "^2.6.2",
+    "tailwind-merge": "^3.5.0",
     "vue": "^3.5.13"
   },
   "devDependencies": {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AuthSession } from '~/types/blogi'
+import { buttonVariants } from '~/components/ui/button/buttonVariants'
 import { getErrorMessage } from '~/utils/errors'
 
 const api = useApiClient()
@@ -36,36 +37,36 @@ async function submit() {
 
 <template>
   <main class="mx-auto max-w-xl px-6 py-16">
-    <section class="panel p-8">
+    <UiCard class="p-8">
       <p class="text-brand text-sm uppercase tracking-[0.3em]">Register</p>
       <h1 class="text-title mt-4 text-3xl font-semibold">创建作者账号</h1>
       <p class="text-muted mt-3 text-sm leading-7">注册成功后会直接写入本地会话，可立即进入文章创建流程。</p>
 
       <form class="mt-8 space-y-5" @submit.prevent="submit">
         <div>
-          <label class="text-body mb-2 block text-sm" for="username">用户名</label>
-          <input id="username" v-model="form.username" class="field" maxlength="32" required type="text">
+          <UiLabel for="username">用户名</UiLabel>
+          <UiInput id="username" v-model="form.username" maxlength="32" required type="text" />
         </div>
 
         <div>
-          <label class="text-body mb-2 block text-sm" for="displayName">昵称</label>
-          <input id="displayName" v-model="form.displayName" class="field" maxlength="40" required type="text">
+          <UiLabel for="displayName">昵称</UiLabel>
+          <UiInput id="displayName" v-model="form.displayName" maxlength="40" required type="text" />
         </div>
 
         <div>
-          <label class="text-body mb-2 block text-sm" for="password">密码</label>
-          <input id="password" v-model="form.password" class="field" minlength="6" required type="password">
+          <UiLabel for="password">密码</UiLabel>
+          <UiInput id="password" v-model="form.password" minlength="6" required type="password" />
         </div>
 
-        <p v-if="errorMessage" class="alert-danger">{{ errorMessage }}</p>
+        <UiAlert v-if="errorMessage" variant="destructive">
+          <UiAlertDescription>{{ errorMessage }}</UiAlertDescription>
+        </UiAlert>
 
         <div class="flex flex-wrap gap-3">
-          <button class="btn-primary" :disabled="pending" type="submit">
-            {{ pending ? '注册中...' : '注册并登录' }}
-          </button>
-          <NuxtLink class="btn-secondary" to="/login">已有账号，去登录</NuxtLink>
+          <UiButton :disabled="pending" type="submit">{{ pending ? '注册中...' : '注册并登录' }}</UiButton>
+          <NuxtLink :class="buttonVariants({ variant: 'secondary' })" to="/login">已有账号，去登录</NuxtLink>
         </div>
       </form>
-    </section>
+    </UiCard>
   </main>
 </template>

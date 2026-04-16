@@ -32,7 +32,9 @@ async function save(payload: PostPayload) {
 
 <template>
   <main class="mx-auto max-w-6xl px-6 py-16">
-    <p v-if="errorMessage" class="alert-danger mb-6">{{ errorMessage }}</p>
+    <UiAlert v-if="errorMessage" class="mb-6" variant="destructive">
+      <UiAlertDescription>{{ errorMessage }}</UiAlertDescription>
+    </UiAlert>
 
     <PostEditorForm
       description="文章保存后会立即进入公开列表，只有作者本人能继续编辑或删除。"

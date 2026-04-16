@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PostDetail } from '~/types/blogi'
+import { buttonVariants } from '~/components/ui/button/buttonVariants'
 import { formatDateTime } from '~/utils/date'
 import { getErrorMessage } from '~/utils/errors'
 import { renderMarkdown } from '~/utils/markdown'
@@ -45,9 +46,11 @@ async function removePost() {
 
 <template>
   <main class="mx-auto max-w-5xl px-6 py-16">
-    <div v-if="error || !post" class="panel px-6 py-8 text-danger">文章不存在，或后端尚未启动。</div>
-    <article v-else class="panel overflow-hidden">
-      <div class="px-8 py-8 md:px-10" style="border-bottom: 1px solid var(--panel-border);">
+    <UiAlert v-if="error || !post" variant="destructive">
+      <UiAlertDescription>文章不存在，或后端尚未启动。</UiAlertDescription>
+    </UiAlert>
+    <UiCard v-else class="overflow-hidden">
+      <div class="px-8 py-8 md:px-10">
         <div class="meta-row">
           <span>{{ post.author.displayName }}</span>
           <span>{{ formatDateTime(post.updatedAt) }}</span>
@@ -56,20 +59,24 @@ async function removePost() {
         <p class="text-body mt-5 max-w-3xl text-lg leading-8">{{ post.summary }}</p>
 
         <div class="mt-8 flex flex-wrap gap-3">
-          <NuxtLink class="btn-secondary" to="/">返回列表</NuxtLink>
-          <NuxtLink v-if="isOwner" class="btn-primary" :to="`/posts/${post.id}/edit`">编辑文章</NuxtLink>
-          <button v-if="isOwner" class="btn-danger" :disabled="deleting" type="button" @click="removePost">
+          <NuxtLink :class="buttonVariants({ variant: 'secondary' })" to="/">返回列表</NuxtLink>
+          <NuxtLink v-if="isOwner" :class="buttonVariants()" :to="`/posts/${post.id}/edit`">编辑文章</NuxtLink>
+          <UiButton v-if="isOwner" :disabled="deleting" type="button" variant="destructive" @click="removePost">
             {{ deleting ? '删除中...' : '删除文章' }}
-          </button>
+          </UiButton>
         </div>
 
-        <p v-if="actionError" class="alert-danger mt-5">{{ actionError }}</p>
+        <UiAlert v-if="actionError" class="mt-5" variant="destructive">
+          <UiAlertDescription>{{ actionError }}</UiAlertDescription>
+        </UiAlert>
       </div>
+
+      <UiSeparator />
 
       <div class="px-8 py-10 md:px-10">
         <!-- eslint-disable-next-line vue/no-v-html -->
         <article class="prose-blog" v-html="html" />
       </div>
-    </article>
+    </UiCard>
   </main>
 </template>

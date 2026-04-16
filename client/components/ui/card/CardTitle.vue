@@ -1,0 +1,14 @@
+<script setup lang="ts">
+import type { HTMLAttributes } from 'vue'
+import { cn } from '~/lib/utils'
+
+defineProps<{
+  class?: HTMLAttributes['class']
+}>()
+</script>
+
+<template>
+  <h3 :class="cn('text-[var(--title)] text-2xl font-semibold tracking-tight', $props.class)">
+    <slot />
+  </h3>
+</template>
