@@ -17,8 +17,8 @@ describe('useAuth', () => {
       user: {
         id: 1,
         username: 'max',
-        displayName: 'Max'
-      }
+        displayName: 'Max',
+      },
     })
 
     expect(auth.token.value).toBe('token-123')
@@ -38,7 +38,7 @@ describe('useAuth', () => {
     auth.user.value = {
       id: 1,
       username: 'max',
-      displayName: 'Max'
+      displayName: 'Max',
     }
 
     await auth.restoreSession()
@@ -56,8 +56,8 @@ describe('useAuth', () => {
       user: {
         id: 1,
         username: 'max',
-        displayName: 'Max'
-      }
+        displayName: 'Max',
+      },
     })
 
     vi.stubGlobal('$fetch', vi.fn().mockRejectedValue({ statusCode: 401 }))

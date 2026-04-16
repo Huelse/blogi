@@ -20,7 +20,7 @@ async function save(payload: PostPayload) {
   try {
     const post = await api<PostDetail>('/posts', {
       method: 'POST',
-      body: payload
+      body: payload,
     })
     await navigateTo(`/posts/${post.id}`)
   } catch (error) {

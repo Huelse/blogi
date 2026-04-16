@@ -36,7 +36,7 @@
       linear-gradient(180deg, #111111 0%, #0a0a0a 100%);
   }
 
-  [data-theme='light'] {
+  [data-theme="light"] {
     color-scheme: light;
     --app-bg: #f8f5ef;
     --title: #1c1917;

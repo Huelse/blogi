@@ -3,7 +3,7 @@ type ThemePreference = 'dark' | 'light'
 export function useTheme() {
   const preference = useCookie<ThemePreference>('blogi_theme', {
     default: () => 'dark',
-    sameSite: 'lax'
+    sameSite: 'lax',
   })
 
   const isDark = computed(() => preference.value !== 'light')
@@ -20,6 +20,6 @@ export function useTheme() {
     preference,
     isDark,
     setTheme,
-    toggleTheme
+    toggleTheme,
   }
 }

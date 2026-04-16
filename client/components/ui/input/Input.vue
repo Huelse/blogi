@@ -3,7 +3,7 @@ import type { HTMLAttributes, InputTypeHTMLAttribute } from 'vue'
 import { cn } from '~/lib/utils'
 
 defineOptions({
-  inheritAttrs: false
+  inheritAttrs: false,
 })
 
 const props = defineProps<{
@@ -20,16 +20,11 @@ const classes = computed(() =>
     'placeholder:text-[var(--field-placeholder)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[color-mix(in_srgb,var(--brand)_16%,transparent)]',
     'focus-visible:border-[color-mix(in_srgb,var(--brand)_55%,transparent)] disabled:cursor-not-allowed disabled:opacity-50',
     attrs.class as HTMLAttributes['class'],
-    props.class
-  )
+    props.class,
+  ),
 )
 </script>
 
 <template>
-  <input
-    v-model="modelValue"
-    :class="classes"
-    :type="props.type"
-    v-bind="$attrs"
-  >
+  <input v-model="modelValue" :class="classes" :type="props.type" v-bind="$attrs">
 </template>

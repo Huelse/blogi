@@ -8,7 +8,5 @@ defineProps<{
 </script>
 
 <template>
-  <p :class="cn('text-sm leading-7 text-[var(--muted)]', $props.class)">
-    <slot />
-  </p>
+  <p :class="cn('text-sm leading-7 text-[var(--muted)]', $props.class)"><slot /></p>
 </template>

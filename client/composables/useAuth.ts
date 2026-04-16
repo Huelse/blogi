@@ -5,11 +5,11 @@ export function useAuth() {
   const config = useRuntimeConfig()
   const token = useCookie<string | null>('blogi_token', {
     default: () => null,
-    sameSite: 'lax'
+    sameSite: 'lax',
   })
   const user = useCookie<UserProfile | null>('blogi_user', {
     default: () => null,
-    sameSite: 'lax'
+    sameSite: 'lax',
   })
 
   const isAuthenticated = computed(() => Boolean(token.value && user.value))
@@ -38,8 +38,8 @@ export function useAuth() {
       const response = await $fetch<ApiEnvelope<UserProfile>>('/auth/me', {
         baseURL: config.public.apiBase,
         headers: {
-          Authorization: `Bearer ${token.value}`
-        }
+          Authorization: `Bearer ${token.value}`,
+        },
       })
 
       user.value = response.data
@@ -56,6 +56,6 @@ export function useAuth() {
     isAuthenticated,
     setSession,
     clearSession,
-    restoreSession
+    restoreSession,
   }
 }

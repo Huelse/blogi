@@ -17,7 +17,7 @@ const errorMessage = ref('')
 
 const { data: post, error } = await useAsyncData(
   () => `edit-post-${postId.value}`,
-  () => api<PostDetail>(`/posts/${postId.value}`)
+  () => api<PostDetail>(`/posts/${postId.value}`),
 )
 
 if (post.value && post.value.author.id !== auth.user.value?.id) {
@@ -31,7 +31,7 @@ async function save(payload: PostPayload) {
   try {
     const updated = await api<PostDetail>(`/posts/${postId.value}`, {
       method: 'PUT',
-      body: payload
+      body: payload,
     })
     await navigateTo(`/posts/${updated.id}`)
   } catch (saveError) {

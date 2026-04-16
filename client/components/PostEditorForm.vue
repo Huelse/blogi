@@ -1,19 +1,22 @@
 <script setup lang="ts">
 import { ArrowLeftIcon, PencilSquareIcon } from '@heroicons/vue/20/solid'
-import type { PostPayload } from '~/types/blogi'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
+import type { PostPayload } from '~/types/blogi'
 import { renderMarkdown } from '~/utils/markdown'
 
-const props = withDefaults(defineProps<{
-  initialValue?: Partial<PostPayload>
-  title: string
-  description: string
-  submitLabel: string
-  submitting?: boolean
-}>(), {
-  initialValue: () => ({}),
-  submitting: false
-})
+const props = withDefaults(
+  defineProps<{
+    initialValue?: Partial<PostPayload>
+    title: string
+    description: string
+    submitLabel: string
+    submitting?: boolean
+  }>(),
+  {
+    initialValue: () => ({}),
+    submitting: false,
+  },
+)
 
 const emit = defineEmits<{
   save: [payload: PostPayload]
@@ -22,22 +25,28 @@ const emit = defineEmits<{
 const form = reactive<PostPayload>({
   title: '',
   summary: '',
-  contentMarkdown: ''
+  contentMarkdown: '',
 })
 
-watch(() => props.initialValue, (value) => {
-  form.title = value.title ?? ''
-  form.summary = value.summary ?? ''
-  form.contentMarkdown = value.contentMarkdown ?? ''
-}, { immediate: true, deep: true })
+watch(
+  () => props.initialValue,
+  (value) => {
+    form.title = value.title ?? ''
+    form.summary = value.summary ?? ''
+    form.contentMarkdown = value.contentMarkdown ?? ''
+  },
+  { immediate: true, deep: true },
+)
 
-const previewHtml = computed(() => renderMarkdown(form.contentMarkdown || '## 预览\n\n在这里输入 Markdown 正文。'))
+const previewHtml = computed(() =>
+  renderMarkdown(form.contentMarkdown || '## 预览\n\n在这里输入 Markdown 正文。'),
+)
 
 function submit() {
   emit('save', {
     title: form.title.trim(),
     summary: form.summary.trim(),
-    contentMarkdown: form.contentMarkdown
+    contentMarkdown: form.contentMarkdown,
   })
 }
 </script>

@@ -9,14 +9,14 @@ export function useApiClient() {
   return async function request<T>(path: string, options: FetchOptions = {}) {
     const headers = {
       ...(auth.token.value ? { Authorization: `Bearer ${auth.token.value}` } : {}),
-      ...((options.headers as Record<string, string> | undefined) ?? {})
+      ...((options.headers as Record<string, string> | undefined) ?? {}),
     }
 
     try {
       const response = await $fetch<ApiEnvelope<T>>(path, {
         baseURL: config.public.apiBase,
         ...options,
-        headers
+        headers,
       })
 
       return response.data

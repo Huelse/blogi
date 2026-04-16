@@ -8,6 +8,8 @@
     "dev:server": "bash -lc 'set -a; [ -f .env ] && source .env; set +a; mvn -f server/pom.xml spring-boot:run'",
     "build": "pnpm --filter client build",
     "lint": "pnpm --filter client lint",
+    "format": "pnpm --filter client format",
+    "check": "pnpm --filter client check",
     "test": "pnpm --filter client test",
     "test:unit": "pnpm --filter client test:unit",
     "test:nuxt": "pnpm --filter client test:nuxt"

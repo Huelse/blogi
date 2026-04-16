@@ -1,6 +1,6 @@
 export function formatDateTime(value: string) {
   return new Intl.DateTimeFormat('zh-CN', {
     dateStyle: 'medium',
-    timeStyle: 'short'
+    timeStyle: 'short',
   }).format(new Date(value))
 }

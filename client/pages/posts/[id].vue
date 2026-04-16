@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { ArrowLeftIcon, ExclamationTriangleIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/20/solid'
-import type { PostDetail } from '~/types/blogi'
+import {
+  ArrowLeftIcon,
+  ExclamationTriangleIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
+import type { PostDetail } from '~/types/blogi'
 import { formatDateTime } from '~/utils/date'
 import { getErrorMessage } from '~/utils/errors'
 import { renderMarkdown } from '~/utils/markdown'
@@ -16,7 +21,7 @@ const actionError = ref('')
 
 const { data: post, error } = await useAsyncData(
   () => `post-${postId.value}`,
-  () => api<PostDetail>(`/posts/${postId.value}`)
+  () => api<PostDetail>(`/posts/${postId.value}`),
 )
 
 const html = computed(() => renderMarkdown(post.value?.contentMarkdown ?? ''))
@@ -59,7 +64,9 @@ async function removePost() {
           <span>{{ post.author.displayName }}</span>
           <span>{{ formatDateTime(post.updatedAt) }}</span>
         </div>
-        <h1 class="text-title mt-5 text-4xl font-semibold tracking-tight md:text-5xl">{{ post.title }}</h1>
+        <h1 class="text-title mt-5 text-4xl font-semibold tracking-tight md:text-5xl">
+          {{ post.title }}
+        </h1>
         <p class="text-body mt-5 max-w-3xl text-lg leading-8">{{ post.summary }}</p>
 
         <div class="mt-8 flex flex-wrap gap-3">
@@ -71,7 +78,13 @@ async function removePost() {
             <PencilSquareIcon aria-hidden="true" class="size-4" />
             编辑文章
           </NuxtLink>
-          <UiButton v-if="isOwner" :disabled="deleting" type="button" variant="destructive" @click="removePost">
+          <UiButton
+            v-if="isOwner"
+            :disabled="deleting"
+            type="button"
+            variant="destructive"
+            @click="removePost"
+          >
             <TrashIcon aria-hidden="true" class="size-4" />
             {{ deleting ? '删除中...' : '删除文章' }}
           </UiButton>

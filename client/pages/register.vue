@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ArrowLeftOnRectangleIcon, ExclamationTriangleIcon, UserPlusIcon } from '@heroicons/vue/20/solid'
-import type { AuthSession } from '~/types/blogi'
+import {
+  ArrowLeftOnRectangleIcon,
+  ExclamationTriangleIcon,
+  UserPlusIcon,
+} from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
+import type { AuthSession } from '~/types/blogi'
 import { getErrorMessage } from '~/utils/errors'
 
 const api = useApiClient()
@@ -10,7 +14,7 @@ const auth = useAuth()
 const form = reactive({
   username: '',
   displayName: '',
-  password: ''
+  password: '',
 })
 
 const pending = ref(false)
@@ -23,7 +27,7 @@ async function submit() {
   try {
     const session = await api<AuthSession>('/auth/register', {
       method: 'POST',
-      body: form
+      body: form,
     })
 
     auth.setSession(session)
@@ -41,7 +45,9 @@ async function submit() {
     <UiCard class="p-8">
       <p class="text-brand text-sm uppercase tracking-[0.3em]">Register</p>
       <h1 class="text-title mt-4 text-3xl font-semibold">创建作者账号</h1>
-      <p class="text-muted mt-3 text-sm leading-7">注册成功后会直接写入本地会话，可立即进入文章创建流程。</p>
+      <p class="text-muted mt-3 text-sm leading-7">
+        注册成功后会直接写入本地会话，可立即进入文章创建流程。
+      </p>
 
       <form class="mt-8 space-y-5" @submit.prevent="submit">
         <div>
@@ -51,7 +57,13 @@ async function submit() {
 
         <div>
           <UiLabel for="displayName">昵称</UiLabel>
-          <UiInput id="displayName" v-model="form.displayName" maxlength="40" required type="text" />
+          <UiInput
+            id="displayName"
+            v-model="form.displayName"
+            maxlength="40"
+            required
+            type="text"
+          />
         </div>
 
         <div>

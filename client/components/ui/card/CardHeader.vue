@@ -8,7 +8,5 @@ defineProps<{
 </script>
 
 <template>
-  <div :class="cn('flex flex-col space-y-2 p-6', $props.class)">
-    <slot />
-  </div>
+  <div :class="cn('flex flex-col space-y-2 p-6', $props.class)"><slot /></div>
 </template>

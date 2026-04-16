@@ -7,14 +7,14 @@ import {
   PencilSquareIcon,
   SunIcon,
   UserCircleIcon,
-  UserPlusIcon
+  UserPlusIcon,
 } from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
 
 const auth = useAuth()
 const theme = useTheme()
 
-const nextThemeLabel = computed(() => theme.isDark.value ? '浅色' : '深色')
+const nextThemeLabel = computed(() => (theme.isDark.value ? '浅色' : '深色'))
 
 async function logout() {
   auth.clearSession()
@@ -32,7 +32,11 @@ async function logout() {
         </NuxtLink>
 
         <div class="flex items-center gap-2 text-sm sm:gap-3">
-          <NuxtLink :class="buttonVariants({ variant: 'secondary', size: 'sm' })" class="hidden sm:inline-flex" to="/">
+          <NuxtLink
+            :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
+            class="hidden sm:inline-flex"
+            to="/"
+          >
             <HomeIcon aria-hidden="true" class="size-4" />
             首页
           </NuxtLink>
@@ -43,7 +47,11 @@ async function logout() {
             type="button"
             @click="theme.toggleTheme()"
           >
-            <component :is="theme.isDark.value ? SunIcon : MoonIcon" aria-hidden="true" class="size-4" />
+            <component
+              :is="theme.isDark.value ? SunIcon : MoonIcon"
+              aria-hidden="true"
+              class="size-4"
+            />
             {{ nextThemeLabel }}
           </UiButton>
           <NuxtLink

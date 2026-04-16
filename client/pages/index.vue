@@ -5,20 +5,25 @@ import {
   BookOpenIcon,
   ExclamationTriangleIcon,
   PencilSquareIcon,
-  UserPlusIcon
+  UserPlusIcon,
 } from '@heroicons/vue/20/solid'
-import type { PostSummary } from '~/types/blogi'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
+import type { PostSummary } from '~/types/blogi'
 import { formatDateTime } from '~/utils/date'
 
 const api = useApiClient()
 const auth = useAuth()
 
-const { data: posts, pending, error, refresh } = await useAsyncData('posts', () => api<PostSummary[]>('/posts'))
+const {
+  data: posts,
+  pending,
+  error,
+  refresh,
+} = await useAsyncData('posts', () => api<PostSummary[]>('/posts'))
 const sortedPosts = computed(() =>
   [...(posts.value ?? [])].sort(
-    (left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime()
-  )
+    (left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime(),
+  ),
 )
 const featuredPost = computed(() => sortedPosts.value[0] ?? null)
 const remainingPosts = computed(() => sortedPosts.value.slice(1))
@@ -38,7 +43,9 @@ const remainingPosts = computed(() => sortedPosts.value.slice(1))
               <span>{{ featuredPost.author.displayName }}</span>
               <span>{{ formatDateTime(featuredPost.updatedAt) }}</span>
             </div>
-            <p class="text-body mt-6 max-w-2xl text-base leading-8 md:text-lg">{{ featuredPost.summary }}</p>
+            <p class="text-body mt-6 max-w-2xl text-base leading-8 md:text-lg">
+              {{ featuredPost.summary }}
+            </p>
           </div>
 
           <div class="mt-8 flex flex-wrap gap-3">
