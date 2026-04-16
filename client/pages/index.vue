@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import {
+  ArrowLeftOnRectangleIcon,
+  ArrowPathIcon,
+  BookOpenIcon,
+  ExclamationTriangleIcon,
+  PencilSquareIcon,
+  UserPlusIcon
+} from '@heroicons/vue/20/solid'
 import type { PostSummary } from '~/types/blogi'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
 import { formatDateTime } from '~/utils/date'
@@ -34,15 +42,22 @@ const remainingPosts = computed(() => sortedPosts.value.slice(1))
           </div>
 
           <div class="mt-8 flex flex-wrap gap-3">
-            <NuxtLink :class="buttonVariants()" :to="`/posts/${featuredPost.id}`">阅读全文</NuxtLink>
+            <NuxtLink :class="buttonVariants()" :to="`/posts/${featuredPost.id}`">
+              <BookOpenIcon aria-hidden="true" class="size-4" />
+              阅读全文
+            </NuxtLink>
             <NuxtLink
               v-if="auth.isAuthenticated.value"
               :class="buttonVariants({ variant: 'secondary' })"
               to="/posts/new"
             >
+              <PencilSquareIcon aria-hidden="true" class="size-4" />
               发布文章
             </NuxtLink>
-            <NuxtLink v-else :class="buttonVariants({ variant: 'secondary' })" to="/register">创建账号</NuxtLink>
+            <NuxtLink v-else :class="buttonVariants({ variant: 'secondary' })" to="/register">
+              <UserPlusIcon aria-hidden="true" class="size-4" />
+              创建账号
+            </NuxtLink>
           </div>
         </UiCard>
 
@@ -58,13 +73,20 @@ const remainingPosts = computed(() => sortedPosts.value.slice(1))
           </div>
 
           <div class="mt-8 flex flex-wrap gap-3">
-            <NuxtLink v-if="auth.isAuthenticated.value" :class="buttonVariants()" to="/posts/new">发布第一篇</NuxtLink>
-            <NuxtLink v-else :class="buttonVariants()" to="/login">立即登录</NuxtLink>
+            <NuxtLink v-if="auth.isAuthenticated.value" :class="buttonVariants()" to="/posts/new">
+              <PencilSquareIcon aria-hidden="true" class="size-4" />
+              发布第一篇
+            </NuxtLink>
+            <NuxtLink v-else :class="buttonVariants()" to="/login">
+              <ArrowLeftOnRectangleIcon aria-hidden="true" class="size-4" />
+              立即登录
+            </NuxtLink>
             <NuxtLink
               v-if="!auth.isAuthenticated.value"
               :class="buttonVariants({ variant: 'secondary' })"
               to="/register"
             >
+              <UserPlusIcon aria-hidden="true" class="size-4" />
               创建账号
             </NuxtLink>
           </div>
@@ -78,7 +100,10 @@ const remainingPosts = computed(() => sortedPosts.value.slice(1))
                 <p class="text-title mt-3 text-3xl font-semibold">{{ sortedPosts.length }}</p>
                 <p class="text-muted mt-2 text-sm">篇文章正在首页按更新时间展示</p>
               </div>
-              <UiButton size="sm" variant="secondary" type="button" @click="refresh()">刷新</UiButton>
+              <UiButton size="sm" variant="secondary" type="button" @click="refresh()">
+                <ArrowPathIcon aria-hidden="true" class="size-4" />
+                刷新
+              </UiButton>
             </div>
           </UiCard>
 
@@ -105,7 +130,10 @@ const remainingPosts = computed(() => sortedPosts.value.slice(1))
 
         <UiCard v-if="pending" class="px-6 py-8">文章列表加载中...</UiCard>
         <UiAlert v-else-if="error" class="px-6 py-5" variant="destructive">
-          <UiAlertDescription>文章列表加载失败，请确认后端已启动。</UiAlertDescription>
+          <UiAlertDescription class="flex items-start gap-2">
+            <ExclamationTriangleIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
+            <span>文章列表加载失败，请确认后端已启动。</span>
+          </UiAlertDescription>
         </UiAlert>
         <UiCard v-else-if="!sortedPosts.length" class="px-6 py-8">
           还没有文章。{{ auth.isAuthenticated.value ? '从右上角开始发布第一篇。' : '注册后即可发布第一篇。' }}
@@ -125,6 +153,7 @@ const remainingPosts = computed(() => sortedPosts.value.slice(1))
               <p class="text-body mt-4 text-sm leading-7">{{ post.summary }}</p>
             </div>
             <NuxtLink :to="`/posts/${post.id}`" class="accent-link mt-8 text-sm font-medium">
+              <BookOpenIcon aria-hidden="true" class="mr-1 inline size-4 align-text-bottom" />
               阅读全文
             </NuxtLink>
           </UiCard>

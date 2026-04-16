@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ExclamationTriangleIcon } from '@heroicons/vue/20/solid'
 import type { PostDetail, PostPayload } from '~/types/blogi'
 import { getErrorMessage } from '~/utils/errors'
 
@@ -33,7 +34,10 @@ async function save(payload: PostPayload) {
 <template>
   <main class="mx-auto max-w-6xl px-6 py-16">
     <UiAlert v-if="errorMessage" class="mb-6" variant="destructive">
-      <UiAlertDescription>{{ errorMessage }}</UiAlertDescription>
+      <UiAlertDescription class="flex items-start gap-2">
+        <ExclamationTriangleIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
+        <span>{{ errorMessage }}</span>
+      </UiAlertDescription>
     </UiAlert>
 
     <PostEditorForm

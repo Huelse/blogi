@@ -15,7 +15,7 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
     optimizeDeps: {
-      include: ['clsx', 'tailwind-merge']
+      include: ['clsx', 'tailwind-merge', '@heroicons/vue/20/solid']
     }
   },
   runtimeConfig: {

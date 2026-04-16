@@ -1,4 +1,14 @@
 <script setup lang="ts">
+import {
+  ArrowLeftOnRectangleIcon,
+  ArrowRightOnRectangleIcon,
+  HomeIcon,
+  MoonIcon,
+  PencilSquareIcon,
+  SunIcon,
+  UserCircleIcon,
+  UserPlusIcon
+} from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
 
 const auth = useAuth()
@@ -23,6 +33,7 @@ async function logout() {
 
         <div class="flex items-center gap-2 text-sm sm:gap-3">
           <NuxtLink :class="buttonVariants({ variant: 'secondary', size: 'sm' })" class="hidden sm:inline-flex" to="/">
+            <HomeIcon aria-hidden="true" class="size-4" />
             首页
           </NuxtLink>
           <UiButton
@@ -32,6 +43,7 @@ async function logout() {
             type="button"
             @click="theme.toggleTheme()"
           >
+            <component :is="theme.isDark.value ? SunIcon : MoonIcon" aria-hidden="true" class="size-4" />
             {{ nextThemeLabel }}
           </UiButton>
           <NuxtLink
@@ -39,11 +51,18 @@ async function logout() {
             :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
             to="/posts/new"
           >
+            <PencilSquareIcon aria-hidden="true" class="size-4" />
             写文章
           </NuxtLink>
           <template v-if="auth.isAuthenticated.value && auth.user.value">
-            <UiBadge class="hidden md:inline-flex" variant="muted">{{ auth.user.value.displayName }}</UiBadge>
-            <UiButton size="sm" variant="secondary" type="button" @click="logout">退出</UiButton>
+            <UiBadge class="hidden md:inline-flex" variant="muted">
+              <UserCircleIcon aria-hidden="true" class="size-4" />
+              {{ auth.user.value.displayName }}
+            </UiBadge>
+            <UiButton size="sm" variant="secondary" type="button" @click="logout">
+              <ArrowRightOnRectangleIcon aria-hidden="true" class="size-4" />
+              退出
+            </UiButton>
           </template>
           <template v-else>
             <NuxtLink
@@ -51,9 +70,13 @@ async function logout() {
               class="hidden sm:inline-flex"
               to="/register"
             >
+              <UserPlusIcon aria-hidden="true" class="size-4" />
               注册
             </NuxtLink>
-            <NuxtLink :class="buttonVariants({ size: 'sm' })" to="/login">登录</NuxtLink>
+            <NuxtLink :class="buttonVariants({ size: 'sm' })" to="/login">
+              <ArrowLeftOnRectangleIcon aria-hidden="true" class="size-4" />
+              登录
+            </NuxtLink>
           </template>
         </div>
       </nav>

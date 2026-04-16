@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ArrowLeftIcon, PencilSquareIcon } from '@heroicons/vue/20/solid'
 import type { PostPayload } from '~/types/blogi'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
 import { renderMarkdown } from '~/utils/markdown'
@@ -79,9 +80,13 @@ function submit() {
 
         <div class="flex flex-wrap gap-3">
           <UiButton :disabled="submitting" type="submit">
+            <PencilSquareIcon aria-hidden="true" class="size-4" />
             {{ submitting ? '提交中...' : submitLabel }}
           </UiButton>
-          <NuxtLink :class="buttonVariants({ variant: 'secondary' })" to="/">返回列表</NuxtLink>
+          <NuxtLink :class="buttonVariants({ variant: 'secondary' })" to="/">
+            <ArrowLeftIcon aria-hidden="true" class="size-4" />
+            返回列表
+          </NuxtLink>
         </div>
       </div>
 

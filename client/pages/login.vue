@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ArrowLeftOnRectangleIcon, ExclamationTriangleIcon, UserPlusIcon } from '@heroicons/vue/20/solid'
 import type { AuthSession } from '~/types/blogi'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
 import { getErrorMessage } from '~/utils/errors'
@@ -54,12 +55,21 @@ async function submit() {
         </div>
 
         <UiAlert v-if="errorMessage" variant="destructive">
-          <UiAlertDescription>{{ errorMessage }}</UiAlertDescription>
+          <UiAlertDescription class="flex items-start gap-2">
+            <ExclamationTriangleIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
+            <span>{{ errorMessage }}</span>
+          </UiAlertDescription>
         </UiAlert>
 
         <div class="flex flex-wrap gap-3">
-          <UiButton :disabled="pending" type="submit">{{ pending ? '登录中...' : '登录' }}</UiButton>
-          <NuxtLink :class="buttonVariants({ variant: 'secondary' })" to="/register">没有账号，去注册</NuxtLink>
+          <UiButton :disabled="pending" type="submit">
+            <ArrowLeftOnRectangleIcon aria-hidden="true" class="size-4" />
+            {{ pending ? '登录中...' : '登录' }}
+          </UiButton>
+          <NuxtLink :class="buttonVariants({ variant: 'secondary' })" to="/register">
+            <UserPlusIcon aria-hidden="true" class="size-4" />
+            没有账号，去注册
+          </NuxtLink>
         </div>
       </form>
     </UiCard>
