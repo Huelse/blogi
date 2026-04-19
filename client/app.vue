@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import {
-  ArrowLeftOnRectangleIcon,
   ArrowRightOnRectangleIcon,
+  Cog6ToothIcon,
   HomeIcon,
   MoonIcon,
-  PencilSquareIcon,
   SunIcon,
   UserCircleIcon,
-  UserPlusIcon,
 } from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
 
@@ -54,15 +52,11 @@ async function logout() {
             />
             {{ nextThemeLabel }}
           </UiButton>
-          <NuxtLink
-            v-if="auth.isAuthenticated.value"
-            :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
-            to="/posts/new"
-          >
-            <PencilSquareIcon aria-hidden="true" class="size-4" />
-            写文章
-          </NuxtLink>
           <template v-if="auth.isAuthenticated.value && auth.user.value">
+            <NuxtLink :class="buttonVariants({ variant: 'secondary', size: 'sm' })" to="/admin">
+              <Cog6ToothIcon aria-hidden="true" class="size-4" />
+              后台管理
+            </NuxtLink>
             <UiBadge class="hidden md:inline-flex" variant="muted">
               <UserCircleIcon aria-hidden="true" class="size-4" />
               {{ auth.user.value.displayName }}
@@ -71,20 +65,6 @@ async function logout() {
               <ArrowRightOnRectangleIcon aria-hidden="true" class="size-4" />
               退出
             </UiButton>
-          </template>
-          <template v-else>
-            <NuxtLink
-              :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
-              class="hidden sm:inline-flex"
-              to="/register"
-            >
-              <UserPlusIcon aria-hidden="true" class="size-4" />
-              注册
-            </NuxtLink>
-            <NuxtLink :class="buttonVariants({ size: 'sm' })" to="/login">
-              <ArrowLeftOnRectangleIcon aria-hidden="true" class="size-4" />
-              登录
-            </NuxtLink>
           </template>
         </div>
       </nav>

@@ -10,10 +10,14 @@ const props = withDefaults(
     title: string
     description: string
     submitLabel: string
+    backTo?: string
+    backLabel?: string
     submitting?: boolean
   }>(),
   {
     initialValue: () => ({}),
+    backTo: '/',
+    backLabel: '返回列表',
     submitting: false,
   },
 )
@@ -52,7 +56,9 @@ function submit() {
 </script>
 
 <template>
-  <UiCard class="p-8">
+  <section
+    class="rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-bg)] p-6 backdrop-blur md:p-8"
+  >
     <div class="max-w-2xl">
       <p class="text-brand text-sm uppercase tracking-[0.3em]">{{ title }}</p>
       <p class="text-muted mt-4 text-sm leading-7">{{ description }}</p>
@@ -92,18 +98,18 @@ function submit() {
             <PencilSquareIcon aria-hidden="true" class="size-4" />
             {{ submitting ? '提交中...' : submitLabel }}
           </UiButton>
-          <NuxtLink :class="buttonVariants({ variant: 'secondary' })" to="/">
+          <NuxtLink :class="buttonVariants({ variant: 'secondary' })" :to="backTo">
             <ArrowLeftIcon aria-hidden="true" class="size-4" />
-            返回列表
+            {{ backLabel }}
           </NuxtLink>
         </div>
       </div>
 
-      <UiCard class="p-6" tone="soft">
+      <div class="rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-soft-bg)] p-6">
         <p class="text-subtle text-sm uppercase tracking-[0.24em]">Preview</p>
         <!-- eslint-disable-next-line vue/no-v-html -->
         <article class="prose-blog mt-6" v-html="previewHtml" />
-      </UiCard>
+      </div>
     </form>
-  </UiCard>
+  </section>
 </template>

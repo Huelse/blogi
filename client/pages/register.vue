@@ -31,7 +31,7 @@ async function submit() {
     })
 
     auth.setSession(session)
-    await navigateTo('/')
+    await navigateTo('/admin')
   } catch (error) {
     errorMessage.value = getErrorMessage(error)
   } finally {
@@ -46,7 +46,7 @@ async function submit() {
       <p class="text-brand text-sm uppercase tracking-[0.3em]">Register</p>
       <h1 class="text-title mt-4 text-3xl font-semibold">创建作者账号</h1>
       <p class="text-muted mt-3 text-sm leading-7">
-        注册成功后会直接写入本地会话，可立即进入文章创建流程。
+        注册成功后会直接写入本地会话，并进入后台管理。
       </p>
 
       <form class="mt-8 space-y-5" @submit.prevent="submit">

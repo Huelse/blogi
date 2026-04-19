@@ -1,14 +1,8 @@
 <script setup lang="ts">
-import {
-  ArrowLeftIcon,
-  ExclamationTriangleIcon,
-  PencilSquareIcon,
-  TrashIcon,
-} from '@heroicons/vue/20/solid'
+import { ArrowLeftIcon, ExclamationTriangleIcon, PencilSquareIcon } from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
 import type { PostDetail } from '~/types/blogi'
 import { formatDateTime } from '~/utils/date'
-import { getErrorMessage } from '~/utils/errors'
 import { renderMarkdown } from '~/utils/markdown'
 
 const route = useRoute()
@@ -16,8 +10,6 @@ const api = useApiClient()
 const auth = useAuth()
 
 const postId = computed(() => String(route.params.id))
-const deleting = ref(false)
-const actionError = ref('')
 
 const { data: post, error } = await useAsyncData(
   () => `post-${postId.value}`,
@@ -26,28 +18,6 @@ const { data: post, error } = await useAsyncData(
 
 const html = computed(() => renderMarkdown(post.value?.contentMarkdown ?? ''))
 const isOwner = computed(() => post.value?.author.id === auth.user.value?.id)
-
-async function removePost() {
-  if (!post.value || !import.meta.client) {
-    return
-  }
-
-  if (!window.confirm(`确定删除《${post.value.title}》吗？`)) {
-    return
-  }
-
-  deleting.value = true
-  actionError.value = ''
-
-  try {
-    await api<null>(`/posts/${post.value.id}`, { method: 'DELETE' })
-    await navigateTo('/')
-  } catch (deleteError) {
-    actionError.value = getErrorMessage(deleteError)
-  } finally {
-    deleting.value = false
-  }
-}
 </script>
 
 <template>
@@ -74,28 +44,11 @@ async function removePost() {
             <ArrowLeftIcon aria-hidden="true" class="size-4" />
             返回列表
           </NuxtLink>
-          <NuxtLink v-if="isOwner" :class="buttonVariants()" :to="`/posts/${post.id}/edit`">
+          <NuxtLink v-if="isOwner" :class="buttonVariants()" :to="`/admin/posts/${post.id}/edit`">
             <PencilSquareIcon aria-hidden="true" class="size-4" />
-            编辑文章
+            后台编辑
           </NuxtLink>
-          <UiButton
-            v-if="isOwner"
-            :disabled="deleting"
-            type="button"
-            variant="destructive"
-            @click="removePost"
-          >
-            <TrashIcon aria-hidden="true" class="size-4" />
-            {{ deleting ? '删除中...' : '删除文章' }}
-          </UiButton>
         </div>
-
-        <UiAlert v-if="actionError" class="mt-5" variant="destructive">
-          <UiAlertDescription class="flex items-start gap-2">
-            <ExclamationTriangleIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
-            <span>{{ actionError }}</span>
-          </UiAlertDescription>
-        </UiAlert>
       </div>
 
       <UiSeparator />

@@ -31,7 +31,7 @@ async function submit() {
     })
 
     auth.setSession(session)
-    await navigateTo(typeof route.query.redirect === 'string' ? route.query.redirect : '/')
+    await navigateTo(typeof route.query.redirect === 'string' ? route.query.redirect : '/admin')
   } catch (error) {
     errorMessage.value = getErrorMessage(error)
   } finally {
@@ -46,7 +46,7 @@ async function submit() {
       <p class="text-brand text-sm uppercase tracking-[0.3em]">Login</p>
       <h1 class="text-title mt-4 text-3xl font-semibold">登录 Blogi</h1>
       <p class="text-muted mt-3 text-sm leading-7">
-        使用用户名和密码换取 JWT，后续写作请求会自动附带认证头。
+        使用用户名和密码进入后台管理，后续写作请求会自动附带认证头。
       </p>
 
       <form class="mt-8 space-y-5" @submit.prevent="submit">
