@@ -1,15 +1,8 @@
 <script setup lang="ts">
-import {
-  BookOpenIcon,
-  ExclamationTriangleIcon,
-  PencilSquareIcon,
-  PlusIcon,
-  TrashIcon,
-} from '@heroicons/vue/20/solid'
+import { DocumentTextIcon, PencilSquareIcon } from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
 import type { PostSummary } from '~/types/blogi'
 import { formatDateTime } from '~/utils/date'
-import { getErrorMessage } from '~/utils/errors'
 
 const route = useRoute()
 const auth = useAuth()
@@ -19,17 +12,14 @@ if (!auth.isAuthenticated.value) {
 }
 
 const api = useApiClient()
-const deletingId = ref<number | null>(null)
-const actionError = ref('')
 
-const {
-  data: posts,
-  pending,
-  error,
-  refresh,
-} = await useAsyncData('admin-posts', () => api<PostSummary[]>('/posts/mine'), {
-  immediate: auth.isAuthenticated.value,
-})
+const { data: posts, pending } = await useAsyncData(
+  'admin-overview-posts',
+  () => api<PostSummary[]>('/posts/mine'),
+  {
+    immediate: auth.isAuthenticated.value,
+  },
+)
 
 const sortedPosts = computed(() =>
   [...(posts.value ?? [])].sort(
@@ -37,97 +27,57 @@ const sortedPosts = computed(() =>
   ),
 )
 
-async function removePost(post: PostSummary) {
-  if (!import.meta.client) {
-    return
-  }
-
-  if (!window.confirm(`确定删除《${post.title}》吗？`)) {
-    return
-  }
-
-  deletingId.value = post.id
-  actionError.value = ''
-
-  try {
-    await api<null>(`/posts/${post.id}`, { method: 'DELETE' })
-    await refresh()
-  } catch (deleteError) {
-    actionError.value = getErrorMessage(deleteError)
-  } finally {
-    deletingId.value = null
-  }
-}
+const latestPost = computed(() => sortedPosts.value[0])
 </script>
 
 <template>
-  <AdminShell title="文章管理" description="管理已发布文章，进入编辑器更新内容，或创建新的文章。">
-    <UiAlert v-if="error || actionError" class="mb-5" variant="destructive">
-      <UiAlertDescription class="flex items-start gap-2">
-        <ExclamationTriangleIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
-        <span>{{ actionError || '文章列表加载失败，请确认后端已启动。' }}</span>
-      </UiAlertDescription>
-    </UiAlert>
+  <AdminShell title="概览" description="查看内容状态，并从这里进入常用管理操作。">
+    <section class="grid gap-4 md:grid-cols-2">
+      <div
+        class="rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-bg)] p-5 backdrop-blur"
+      >
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <p class="text-muted text-sm">文章总数</p>
+            <p class="text-title mt-3 text-4xl font-semibold">
+              {{ pending ? '-' : sortedPosts.length }}
+            </p>
+          </div>
+          <DocumentTextIcon aria-hidden="true" class="size-8 text-[var(--brand)]" />
+        </div>
+      </div>
+
+      <div
+        class="rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-bg)] p-5 backdrop-blur"
+      >
+        <p class="text-muted text-sm">最近更新</p>
+        <p class="text-title mt-3 truncate text-xl font-semibold">
+          {{ latestPost?.title ?? '暂无文章' }}
+        </p>
+        <p class="text-muted mt-2 text-sm">
+          {{ latestPost ? formatDateTime(latestPost.updatedAt) : '创建文章后会显示更新时间' }}
+        </p>
+      </div>
+    </section>
 
     <section
-      class="rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-bg)] backdrop-blur"
+      class="mt-5 rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-bg)] p-5 backdrop-blur"
     >
-      <div
-        class="flex flex-col gap-3 border-b border-[var(--panel-border)] px-5 py-4 md:flex-row md:items-center md:justify-between"
-      >
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 class="text-title text-lg font-semibold">我的文章</h2>
-          <p class="text-muted mt-1 text-sm">共 {{ sortedPosts.length }} 篇文章</p>
+          <h2 class="text-title text-lg font-semibold">快捷操作</h2>
+          <p class="text-muted mt-1 text-sm">进入文章列表或打开编辑器。</p>
         </div>
-        <NuxtLink :class="buttonVariants({ size: 'sm' })" to="/admin/posts/new">
-          <PlusIcon aria-hidden="true" class="size-4" />
-          新增文章
-        </NuxtLink>
-      </div>
-
-      <div v-if="pending" class="px-5 py-8 text-sm text-[var(--body)]">文章加载中...</div>
-
-      <div v-else-if="!sortedPosts.length" class="px-5 py-8">
-        <p class="text-title text-base font-medium">还没有文章。</p>
-        <p class="text-muted mt-2 text-sm">可以从左侧菜单或右上角按钮开始写第一篇。</p>
-      </div>
-
-      <div v-else class="divide-y divide-[var(--panel-border)]">
-        <article
-          v-for="post in sortedPosts"
-          :key="post.id"
-          class="grid gap-4 px-5 py-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
-        >
-          <div class="min-w-0">
-            <div class="meta-row"><span>{{ formatDateTime(post.updatedAt) }}</span></div>
-            <h3 class="text-title mt-2 truncate text-xl font-semibold">{{ post.title }}</h3>
-            <p class="text-body mt-2 line-clamp-2 text-sm leading-7">{{ post.summary }}</p>
-          </div>
-
-          <div class="flex flex-wrap gap-2">
-            <NuxtLink
-              :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
-              :to="`/posts/${post.id}`"
-            >
-              <BookOpenIcon aria-hidden="true" class="size-4" />
-              查看
-            </NuxtLink>
-            <NuxtLink :class="buttonVariants({ size: 'sm' })" :to="`/admin/posts/${post.id}/edit`">
-              <PencilSquareIcon aria-hidden="true" class="size-4" />
-              编辑
-            </NuxtLink>
-            <UiButton
-              :disabled="deletingId === post.id"
-              size="sm"
-              type="button"
-              variant="destructive"
-              @click="removePost(post)"
-            >
-              <TrashIcon aria-hidden="true" class="size-4" />
-              {{ deletingId === post.id ? '删除中...' : '删除' }}
-            </UiButton>
-          </div>
-        </article>
+        <div class="flex flex-wrap gap-3">
+          <NuxtLink :class="buttonVariants({ variant: 'secondary' })" to="/admin/posts">
+            <DocumentTextIcon aria-hidden="true" class="size-4" />
+            文章管理
+          </NuxtLink>
+          <NuxtLink :class="buttonVariants()" to="/admin/posts/new">
+            <PencilSquareIcon aria-hidden="true" class="size-4" />
+            写文章
+          </NuxtLink>
+        </div>
       </div>
     </section>
   </AdminShell>

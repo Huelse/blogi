@@ -24,7 +24,7 @@ const { data: post, error } = await useAsyncData(
 )
 
 if (post.value && post.value.author.id !== auth.user.value?.id) {
-  await navigateTo('/admin')
+  await navigateTo('/admin/posts')
 }
 
 async function save(payload: PostPayload) {
@@ -65,8 +65,8 @@ async function save(payload: PostPayload) {
       </UiAlert>
 
       <PostEditorForm
-        back-label="返回后台"
-        back-to="/admin"
+        back-label="返回文章管理"
+        back-to="/admin/posts"
         description="只有作者本人可以更新内容。保存后会覆盖原文，并刷新详情页展示。"
         :initial-value="post"
         :submitting="pending"

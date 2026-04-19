@@ -18,8 +18,14 @@ const auth = useAuth()
 
 const adminNav = [
   {
-    label: '文章管理',
+    label: '概览',
     to: '/admin',
+    icon: HomeIcon,
+    exact: true,
+  },
+  {
+    label: '文章管理',
+    to: '/admin/posts',
     icon: DocumentTextIcon,
     exact: true,
   },
@@ -27,11 +33,6 @@ const adminNav = [
     label: '写文章',
     to: '/admin/posts/new',
     icon: PencilSquareIcon,
-  },
-  {
-    label: '前台首页',
-    to: '/',
-    icon: HomeIcon,
   },
 ]
 
