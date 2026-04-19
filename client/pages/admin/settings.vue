@@ -23,7 +23,7 @@ const layoutOptions: Array<{
   {
     label: '卡片模式',
     value: 'card',
-    description: '预留的文章卡片网格展示方式，渲染样式尚未实现。',
+    description: '以网格卡片展示文章摘要，适合突出多篇内容的浏览入口。',
   },
 ]
 </script>
@@ -36,7 +36,7 @@ const layoutOptions: Array<{
       <div class="flex flex-col gap-2 border-b border-[var(--panel-border)] pb-5">
         <h2 class="text-title text-lg font-semibold">博客列表展示方式</h2>
         <p class="text-muted text-sm leading-7">
-          选择前台文章列表的展示模式。卡片模式现在只保存配置，前台卡片样式后续实现。
+          选择前台文章列表的展示模式，设置会保存到当前浏览器。
         </p>
       </div>
 

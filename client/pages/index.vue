@@ -5,6 +5,7 @@ import type { PostSummary } from '~/types/blogi'
 import { formatDateTime } from '~/utils/date'
 
 const api = useApiClient()
+const blogSettings = useBlogSettings()
 
 const {
   data: posts,
@@ -16,6 +17,7 @@ const sortedPosts = computed(() =>
     (left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime(),
   ),
 )
+const isCardLayout = computed(() => blogSettings.postListLayout.value === 'card')
 </script>
 
 <template>
@@ -41,6 +43,34 @@ const sortedPosts = computed(() =>
           class="border-t border-[var(--panel-border)] py-8 text-sm leading-7 text-[var(--body)]"
         >
           还没有文章。
+        </div>
+
+        <div v-else-if="isCardLayout" class="grid gap-4 md:grid-cols-2">
+          <NuxtLink
+            v-for="post in sortedPosts"
+            :key="post.id"
+            class="flex min-h-[260px] flex-col rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-bg)] p-5 transition hover:border-[var(--secondary-border-hover)] hover:bg-[var(--secondary-bg-hover)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[color-mix(in_srgb,var(--brand)_16%,transparent)]"
+            :to="`/posts/${post.id}`"
+          >
+            <div class="meta-row">
+              <span>{{ post.author.displayName }}</span>
+              <span>{{ formatDateTime(post.updatedAt) }}</span>
+            </div>
+            <h2 class="text-title mt-4 line-clamp-2 text-2xl font-semibold tracking-tight">
+              {{ post.title }}
+            </h2>
+            <p class="text-body mt-4 line-clamp-3 text-sm leading-7">{{ post.summary }}</p>
+
+            <div class="mt-auto pt-6">
+              <span
+                :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
+                aria-hidden="true"
+              >
+                <BookOpenIcon aria-hidden="true" class="size-4" />
+                阅读全文
+              </span>
+            </div>
+          </NuxtLink>
         </div>
 
         <div v-else class="border-t border-[var(--panel-border)]">
