@@ -44,10 +44,11 @@ const sortedPosts = computed(() =>
         </div>
 
         <div v-else class="border-t border-[var(--panel-border)]">
-          <article
+          <NuxtLink
             v-for="post in sortedPosts"
             :key="post.id"
-            class="grid gap-4 border-b border-[var(--panel-border)] py-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-8"
+            class="-mx-3 grid gap-4 border-b border-[var(--panel-border)] px-3 py-8 transition hover:bg-[var(--secondary-bg-hover)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[color-mix(in_srgb,var(--brand)_16%,transparent)] md:grid-cols-[minmax(0,1fr)_auto] md:gap-8"
+            :to="`/posts/${post.id}`"
           >
             <div>
               <div class="meta-row">
@@ -63,15 +64,15 @@ const sortedPosts = computed(() =>
             </div>
 
             <div class="flex items-start md:items-center">
-              <NuxtLink
+              <span
                 :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
-                :to="`/posts/${post.id}`"
+                aria-hidden="true"
               >
                 <BookOpenIcon aria-hidden="true" class="size-4" />
                 阅读全文
-              </NuxtLink>
+              </span>
             </div>
-          </article>
+          </NuxtLink>
         </div>
       </section>
     </section>

@@ -58,6 +58,10 @@ async function removePost(post: PostSummary) {
     deletingId.value = null
   }
 }
+
+async function openPostEditor(post: PostSummary) {
+  await navigateTo(`/admin/posts/${post.id}/edit`)
+}
 </script>
 
 <template>
@@ -96,7 +100,12 @@ async function removePost(post: PostSummary) {
         <article
           v-for="post in sortedPosts"
           :key="post.id"
-          class="grid gap-4 px-5 py-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+          class="grid cursor-pointer gap-4 px-5 py-5 transition hover:bg-[var(--secondary-bg-hover)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[color-mix(in_srgb,var(--brand)_16%,transparent)] md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+          role="link"
+          tabindex="0"
+          @click="openPostEditor(post)"
+          @keydown.enter="openPostEditor(post)"
+          @keydown.space.prevent="openPostEditor(post)"
         >
           <div class="min-w-0">
             <div class="meta-row"><span>{{ formatDateTime(post.updatedAt) }}</span></div>
@@ -108,11 +117,16 @@ async function removePost(post: PostSummary) {
             <NuxtLink
               :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
               :to="`/posts/${post.id}`"
+              @click.stop
             >
               <BookOpenIcon aria-hidden="true" class="size-4" />
               查看
             </NuxtLink>
-            <NuxtLink :class="buttonVariants({ size: 'sm' })" :to="`/admin/posts/${post.id}/edit`">
+            <NuxtLink
+              :class="buttonVariants({ size: 'sm' })"
+              :to="`/admin/posts/${post.id}/edit`"
+              @click.stop
+            >
               <PencilSquareIcon aria-hidden="true" class="size-4" />
               编辑
             </NuxtLink>
@@ -121,7 +135,7 @@ async function removePost(post: PostSummary) {
               size="sm"
               type="button"
               variant="destructive"
-              @click="removePost(post)"
+              @click.stop="removePost(post)"
             >
               <TrashIcon aria-hidden="true" class="size-4" />
               {{ deletingId === post.id ? '删除中...' : '删除' }}
