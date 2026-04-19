@@ -34,6 +34,11 @@ const adminNav = [
     to: '/admin/posts/new',
     icon: PencilSquareIcon,
   },
+  {
+    label: '博客设置',
+    to: '/admin/settings',
+    icon: Cog6ToothIcon,
+  },
 ]
 
 function isActive(item: (typeof adminNav)[number]) {
