@@ -52,19 +52,22 @@ const isCardLayout = computed(() => blogSettings.postListLayout.value === 'card'
             class="flex min-h-[260px] flex-col rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-bg)] p-5 transition hover:border-[var(--secondary-border-hover)] hover:bg-[var(--secondary-bg-hover)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[color-mix(in_srgb,var(--brand)_16%,transparent)]"
             :to="`/posts/${post.id}`"
           >
-            <div class="meta-row">
-              <span>{{ post.author.displayName }}</span>
-              <span>{{ formatDateTime(post.updatedAt) }}</span>
-            </div>
-            <h2 class="text-title mt-4 line-clamp-2 text-2xl font-semibold tracking-tight">
+            <h2 class="text-title line-clamp-2 text-2xl font-semibold tracking-tight">
               {{ post.title }}
             </h2>
             <p class="text-body mt-4 line-clamp-3 text-sm leading-7">{{ post.summary }}</p>
 
-            <div class="mt-auto pt-6">
+            <div
+              class="mt-auto flex flex-col gap-4 pt-6 sm:flex-row sm:items-end sm:justify-between"
+            >
+              <div class="meta-row order-2 sm:order-1">
+                <span>{{ post.author.displayName }}</span>
+                <span>{{ formatDateTime(post.updatedAt) }}</span>
+              </div>
               <span
                 :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
                 aria-hidden="true"
+                class="order-1 self-start sm:order-2 sm:self-auto"
               >
                 <BookOpenIcon aria-hidden="true" class="size-4" />
                 阅读全文
