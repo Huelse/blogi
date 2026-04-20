@@ -128,4 +128,51 @@ class BlogiApiIntegrationTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data", hasSize(0)));
     }
+
+    @Test
+    void authenticatedUserCanUpdateFooterSettings() throws Exception {
+        mockMvc.perform(get("/api/settings"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(true)));
+
+        mockMvc.perform(put("/api/settings")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "footerHtml": "<p>Public footer</p>"
+                    }
+                    """))
+            .andExpect(status().isUnauthorized());
+
+        var registerResponse = mockMvc.perform(post("/api/auth/register")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "username": "settingsuser",
+                      "displayName": "Settings User",
+                      "password": "password123"
+                    }
+                    """))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        var token = JsonTestUtils.read(registerResponse, "$.data.token");
+
+        mockMvc.perform(put("/api/settings")
+                .header("Authorization", "Bearer " + token)
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "footerHtml": "<p>Public footer</p>"
+                    }
+                    """))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.footerHtml", is("<p>Public footer</p>")));
+
+        mockMvc.perform(get("/api/settings"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.footerHtml", is("<p>Public footer</p>")));
+    }
 }

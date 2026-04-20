@@ -232,4 +232,39 @@
     color: var(--accent-link);
     text-decoration-color: color-mix(in srgb, var(--accent-link) 40%, transparent);
   }
+
+  .site-footer-html {
+    @apply text-sm leading-7;
+    color: var(--body);
+  }
+
+  .site-footer-html :where(p, ul, ol) {
+    @apply my-2;
+  }
+
+  .site-footer-html :where(ul, ol) {
+    @apply pl-5;
+  }
+
+  .site-footer-html ul {
+    @apply list-disc;
+  }
+
+  .site-footer-html ol {
+    @apply list-decimal;
+  }
+
+  .site-footer-html :where(strong, b) {
+    color: var(--title);
+  }
+
+  .site-footer-html a {
+    @apply underline underline-offset-4;
+    color: var(--accent-link);
+    text-decoration-color: color-mix(in srgb, var(--accent-link) 40%, transparent);
+  }
+
+  .site-footer-html a:hover {
+    color: color-mix(in srgb, var(--accent-link) 82%, white);
+  }
 }

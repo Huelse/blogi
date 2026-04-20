@@ -58,5 +58,7 @@ const isOwner = computed(() => post.value?.author.id === auth.user.value?.id)
         <article class="prose-blog" v-html="html" />
       </div>
     </UiCard>
+
+    <SiteFooter class="mt-10" />
   </main>
 </template>

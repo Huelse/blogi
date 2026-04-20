@@ -39,3 +39,7 @@ export interface PostPayload {
   summary: string
   contentMarkdown: string
 }
+
+export interface BlogSettings {
+  footerHtml: string
+}

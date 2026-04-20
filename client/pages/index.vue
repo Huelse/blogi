@@ -108,6 +108,8 @@ const isCardLayout = computed(() => blogSettings.postListLayout.value === 'card'
           </NuxtLink>
         </div>
       </section>
+
+      <SiteFooter class="mt-10" />
     </section>
   </main>
 </template>

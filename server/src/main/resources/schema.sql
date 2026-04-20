@@ -19,3 +19,9 @@ CREATE TABLE IF NOT EXISTS posts (
 
 CREATE INDEX IF NOT EXISTS idx_posts_author_id ON posts (author_id);
 CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts (created_at DESC);
+
+CREATE TABLE IF NOT EXISTS site_settings (
+    setting_key VARCHAR(64) PRIMARY KEY,
+    setting_value TEXT NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);
