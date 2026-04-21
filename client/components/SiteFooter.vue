@@ -25,12 +25,12 @@ const footerHtml = computed(() => settings.value.footerHtml.trim())
     v-if="footerHtml"
     :class="
       cn(
-        'site-footer rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-bg)] px-6 py-5 backdrop-blur',
+        'site-footer w-full border-t border-[var(--nav-border)] bg-[var(--nav-bg)] backdrop-blur',
         props.class,
       )
     "
   >
     <!-- eslint-disable-next-line vue/no-v-html -->
-    <div class="site-footer-html" v-html="footerHtml" />
+    <div class="site-footer-html mx-auto max-w-6xl px-6 py-5" v-html="footerHtml" />
   </footer>
 </template>
