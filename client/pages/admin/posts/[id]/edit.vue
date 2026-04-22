@@ -48,7 +48,7 @@ async function save(payload: PostPayload) {
 <template>
   <AdminShell
     title="编辑文章"
-    description="更新标题、摘要和 Markdown 正文。保存后会刷新前台详情页展示。"
+    description="更新标题、摘要、分类、标签和 Markdown 正文。保存后会刷新前台详情页展示。"
   >
     <UiAlert v-if="error || !post" variant="destructive">
       <UiAlertDescription class="flex items-start gap-2">
@@ -67,7 +67,7 @@ async function save(payload: PostPayload) {
       <PostEditorForm
         back-label="返回文章管理"
         back-to="/admin/posts"
-        description="只有作者本人可以更新内容。保存后会覆盖原文，并刷新详情页展示。"
+        description="只有作者本人可以更新内容。清空分类或标签后，文章会从对应筛选项中移除。"
         :initial-value="post"
         :submitting="pending"
         submit-label="保存修改"

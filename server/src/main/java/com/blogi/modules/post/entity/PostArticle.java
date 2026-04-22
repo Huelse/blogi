@@ -1,6 +1,8 @@
 package com.blogi.modules.post.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
@@ -11,6 +13,8 @@ public class PostArticle {
     @TableId(type = IdType.AUTO)
     private Long id;
     private Long authorId;
+    @TableField(updateStrategy = FieldStrategy.ALWAYS)
+    private Long categoryId;
     private String title;
     private String summary;
     private String contentMarkdown;
@@ -31,6 +35,14 @@ public class PostArticle {
 
     public void setAuthorId(Long authorId) {
         this.authorId = authorId;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getTitle() {

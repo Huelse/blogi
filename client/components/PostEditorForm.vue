@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { ArrowLeftIcon, PencilSquareIcon } from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
-import type { PostPayload } from '~/types/blogi'
+import type { PostCategory, PostPayload, PostTag } from '~/types/blogi'
 import { renderMarkdown } from '~/utils/markdown'
+
+type PostEditorInitialValue = Partial<Omit<PostPayload, 'category' | 'tags'>> & {
+  category?: string | PostCategory | null
+  tags?: Array<string | PostTag>
+}
 
 const props = withDefaults(
   defineProps<{
-    initialValue?: Partial<PostPayload>
+    initialValue?: PostEditorInitialValue
     title: string
     description: string
     submitLabel: string
@@ -30,7 +35,10 @@ const form = reactive<PostPayload>({
   title: '',
   summary: '',
   contentMarkdown: '',
+  category: '',
+  tags: [],
 })
+const tagText = ref('')
 
 watch(
   () => props.initialValue,
@@ -38,6 +46,8 @@ watch(
     form.title = value.title ?? ''
     form.summary = value.summary ?? ''
     form.contentMarkdown = value.contentMarkdown ?? ''
+    form.category = normalizeInitialCategory(value.category)
+    tagText.value = normalizeInitialTags(value.tags).join(', ')
   },
   { immediate: true, deep: true },
 )
@@ -51,7 +61,40 @@ function submit() {
     title: form.title.trim(),
     summary: form.summary.trim(),
     contentMarkdown: form.contentMarkdown,
+    category: form.category.trim(),
+    tags: parseTags(tagText.value),
   })
+}
+
+function normalizeInitialCategory(category: PostEditorInitialValue['category']) {
+  if (!category) {
+    return ''
+  }
+  return typeof category === 'string' ? category : category.name
+}
+
+function normalizeInitialTags(tags: PostEditorInitialValue['tags']) {
+  if (!tags) {
+    return []
+  }
+  return tags
+    .map((tag) => (typeof tag === 'string' ? tag : tag.name))
+    .map((tag) => tag.trim())
+    .filter(Boolean)
+}
+
+function parseTags(value: string) {
+  const tagsByKey = new Map<string, string>()
+
+  for (const rawTag of value.split(/[,，\n]/)) {
+    const tag = rawTag.trim()
+    if (!tag) {
+      continue
+    }
+    tagsByKey.set(tag.toLowerCase(), tag)
+  }
+
+  return [...tagsByKey.values()]
 }
 </script>
 
@@ -80,6 +123,30 @@ function submit() {
             maxlength="280"
             placeholder="可选，不填时后端会从正文自动生成摘要"
           />
+        </div>
+
+        <div class="grid gap-5 md:grid-cols-2">
+          <div>
+            <UiLabel for="category">分类</UiLabel>
+            <UiInput
+              id="category"
+              v-model="form.category"
+              maxlength="40"
+              placeholder="例如：工程日志"
+              type="text"
+            />
+          </div>
+
+          <div>
+            <UiLabel for="tags">标签</UiLabel>
+            <UiInput
+              id="tags"
+              v-model="tagText"
+              maxlength="280"
+              placeholder="用逗号分隔，例如：Nuxt, Spring"
+              type="text"
+            />
+          </div>
         </div>
 
         <div>

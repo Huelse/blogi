@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import {
   BookOpenIcon,
+  ChatBubbleLeftEllipsisIcon,
   ExclamationTriangleIcon,
+  FolderIcon,
   PencilSquareIcon,
   PlusIcon,
+  TagIcon,
   TrashIcon,
 } from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
@@ -108,9 +111,30 @@ async function openPostEditor(post: PostSummary) {
           @keydown.space.prevent="openPostEditor(post)"
         >
           <div class="min-w-0">
-            <div class="meta-row"><span>{{ formatDateTime(post.updatedAt) }}</span></div>
+            <div class="meta-row">
+              <span>{{ formatDateTime(post.updatedAt) }}</span>
+              <span class="inline-flex items-center gap-1.5">
+                <ChatBubbleLeftEllipsisIcon aria-hidden="true" class="size-4" />
+                {{ post.commentCount }}
+              </span>
+            </div>
             <h3 class="text-title mt-2 truncate text-xl font-semibold">{{ post.title }}</h3>
             <p class="text-body mt-2 line-clamp-2 text-sm leading-7">{{ post.summary }}</p>
+            <div v-if="post.category || post.tags?.length" class="mt-3 flex flex-wrap gap-2">
+              <UiBadge v-if="post.category" class="gap-1.5 px-3 py-1 text-xs" variant="muted">
+                <FolderIcon aria-hidden="true" class="size-3.5" />
+                {{ post.category.name }}
+              </UiBadge>
+              <UiBadge
+                v-for="tag in post.tags"
+                :key="tag.id"
+                class="gap-1.5 px-3 py-1 text-xs"
+                variant="outline"
+              >
+                <TagIcon aria-hidden="true" class="size-3.5" />
+                {{ tag.name }}
+              </UiBadge>
+            </div>
           </div>
 
           <div class="flex flex-wrap gap-2">

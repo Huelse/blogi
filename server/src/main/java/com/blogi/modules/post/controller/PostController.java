@@ -2,8 +2,12 @@ package com.blogi.modules.post.controller;
 
 import com.blogi.common.api.ApiResponse;
 import com.blogi.common.exception.ApiException;
+import com.blogi.modules.post.dto.PostCategoryResponse;
+import com.blogi.modules.post.dto.PostCommentRequest;
+import com.blogi.modules.post.dto.PostCommentResponse;
 import com.blogi.modules.post.dto.PostDetailResponse;
 import com.blogi.modules.post.dto.PostSummaryResponse;
+import com.blogi.modules.post.dto.PostTagResponse;
 import com.blogi.modules.post.dto.PostUpsertRequest;
 import com.blogi.modules.post.service.PostService;
 import com.blogi.security.UserPrincipal;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,8 +35,21 @@ public class PostController {
     }
 
     @GetMapping
-    public ApiResponse<List<PostSummaryResponse>> listPosts() {
-        return ApiResponse.ok(postService.listPosts());
+    public ApiResponse<List<PostSummaryResponse>> listPosts(
+        @RequestParam(required = false) String category,
+        @RequestParam(required = false) String tag
+    ) {
+        return ApiResponse.ok(postService.listPosts(category, tag));
+    }
+
+    @GetMapping("/categories")
+    public ApiResponse<List<PostCategoryResponse>> listCategories() {
+        return ApiResponse.ok(postService.listCategories());
+    }
+
+    @GetMapping("/tags")
+    public ApiResponse<List<PostTagResponse>> listTags() {
+        return ApiResponse.ok(postService.listTags());
     }
 
     @GetMapping("/mine")
@@ -42,6 +60,30 @@ public class PostController {
     @GetMapping("/{postId}")
     public ApiResponse<PostDetailResponse> getPost(@PathVariable Long postId) {
         return ApiResponse.ok(postService.getPost(postId));
+    }
+
+    @GetMapping("/{postId}/comments")
+    public ApiResponse<List<PostCommentResponse>> listComments(@PathVariable Long postId) {
+        return ApiResponse.ok(postService.listComments(postId));
+    }
+
+    @PostMapping("/{postId}/comments")
+    public ApiResponse<PostCommentResponse> createComment(
+        @PathVariable Long postId,
+        @AuthenticationPrincipal UserPrincipal principal,
+        @Valid @RequestBody PostCommentRequest request
+    ) {
+        return ApiResponse.ok(postService.createComment(postId, requireUserId(principal), request));
+    }
+
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    public ApiResponse<Void> deleteComment(
+        @PathVariable Long postId,
+        @PathVariable Long commentId,
+        @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        postService.deleteComment(postId, commentId, requireUserId(principal));
+        return ApiResponse.ok(null);
     }
 
     @PostMapping

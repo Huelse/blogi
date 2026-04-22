@@ -88,7 +88,7 @@ pnpm dev:server
 ## TODO
 
 - [x] 用户注册 / 登录 + JWT + 文章 CRUD + Markdown 展示
-- [ ] 评论功能 + 文章分类
+- [x] 评论功能 + 文章分类 + 文章标签
 - [ ] 前端 Vue 3 接入 + 路由守卫
 - [ ] 文件上传（头像 / 封面）
 - [ ] AI 摘要生成 + Redis 缓存阅读量 / 点赞量
@@ -100,4 +100,6 @@ pnpm dev:server
 
 - `/api/auth/register`、`/api/auth/login`、JWT 鉴权
 - `/api/posts` 相关创建、编辑、删除、详情与列表接口
+- `/api/posts/categories`、`/api/posts/tags`、`/api/posts/{id}/comments` 分类、标签与评论接口
 - 前端注册、登录、发文、编辑与 Markdown 渲染页面
+- 前端文章分类 / 标签筛选、详情页评论展示与登录用户评论发布

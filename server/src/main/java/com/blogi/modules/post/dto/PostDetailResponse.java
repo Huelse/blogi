@@ -1,6 +1,7 @@
 package com.blogi.modules.post.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record PostDetailResponse(
     Long id,
@@ -9,6 +10,9 @@ public record PostDetailResponse(
     String contentMarkdown,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
-    PostAuthorResponse author
+    PostAuthorResponse author,
+    PostCategoryResponse category,
+    List<PostTagResponse> tags,
+    long commentCount
 ) {
 }

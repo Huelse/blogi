@@ -44,7 +44,7 @@ async function save(payload: PostPayload) {
     <PostEditorForm
       back-label="返回文章管理"
       back-to="/admin/posts"
-      description="文章保存后会立即进入公开列表，只有作者本人能继续编辑或删除。"
+      description="文章保存后会立即进入公开列表，分类和标签会自动创建并用于前台筛选。"
       :submitting="pending"
       submit-label="发布文章"
       title="New Post"

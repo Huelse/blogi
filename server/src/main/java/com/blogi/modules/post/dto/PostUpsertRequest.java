@@ -2,6 +2,7 @@ package com.blogi.modules.post.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 
 public record PostUpsertRequest(
     @NotBlank(message = "标题不能为空")
@@ -11,6 +12,10 @@ public record PostUpsertRequest(
     String summary,
     @NotBlank(message = "正文不能为空")
     @Size(max = 50000, message = "正文不能超过 50000 个字符")
-    String contentMarkdown
+    String contentMarkdown,
+    @Size(max = 40, message = "分类不能超过 40 个字符")
+    String category,
+    @Size(max = 12, message = "标签不能超过 12 个")
+    List<String> tags
 ) {
 }

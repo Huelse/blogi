@@ -130,6 +130,127 @@ class BlogiApiIntegrationTests {
     }
 
     @Test
+    void userCanCategorizeTagAndCommentOnPost() throws Exception {
+        var writerResponse = mockMvc.perform(post("/api/auth/register")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "username": "techwriter",
+                      "displayName": "Tech Writer",
+                      "password": "password123"
+                    }
+                    """))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        var writerToken = JsonTestUtils.read(writerResponse, "$.data.token");
+
+        var createResponse = mockMvc.perform(post("/api/posts")
+                .header("Authorization", "Bearer " + writerToken)
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "title": "Taxonomy Post",
+                      "summary": "Post with category and tags",
+                      "contentMarkdown": "# Taxonomy\\n\\nPost body.",
+                      "category": "Engineering",
+                      "tags": ["Spring Boot", "Vue", "vue"]
+                    }
+                    """))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.category.name", is("Engineering")))
+            .andExpect(jsonPath("$.data.category.slug", is("engineering")))
+            .andExpect(jsonPath("$.data.tags", hasSize(2)))
+            .andExpect(jsonPath("$.data.tags[0].name", is("Spring Boot")))
+            .andExpect(jsonPath("$.data.tags[1].name", is("Vue")))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        var postId = JsonTestUtils.read(createResponse, "$.data.id");
+
+        mockMvc.perform(get("/api/posts/categories"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data[?(@.slug == 'engineering')]", hasSize(1)));
+
+        mockMvc.perform(get("/api/posts/tags"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data[?(@.slug == 'spring-boot')]", hasSize(1)))
+            .andExpect(jsonPath("$.data[?(@.slug == 'vue')]", hasSize(1)));
+
+        mockMvc.perform(get("/api/posts?category=engineering&tag=spring-boot"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", hasSize(1)))
+            .andExpect(jsonPath("$.data[0].title", is("Taxonomy Post")))
+            .andExpect(jsonPath("$.data[0].commentCount", is(0)));
+
+        mockMvc.perform(post("/api/posts/" + postId + "/comments")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "content": "Needs a token."
+                    }
+                    """))
+            .andExpect(status().isUnauthorized());
+
+        var commenterResponse = mockMvc.perform(post("/api/auth/register")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "username": "commenter",
+                      "displayName": "Commenter",
+                      "password": "password123"
+                    }
+                    """))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        var commenterToken = JsonTestUtils.read(commenterResponse, "$.data.token");
+
+        var commentResponse = mockMvc.perform(post("/api/posts/" + postId + "/comments")
+                .header("Authorization", "Bearer " + commenterToken)
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "content": "Great article."
+                    }
+                    """))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.content", is("Great article.")))
+            .andExpect(jsonPath("$.data.author.username", is("commenter")))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        var commentId = JsonTestUtils.read(commentResponse, "$.data.id");
+
+        mockMvc.perform(get("/api/posts/" + postId + "/comments"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", hasSize(1)))
+            .andExpect(jsonPath("$.data[0].content", is("Great article.")));
+
+        mockMvc.perform(get("/api/posts/" + postId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.commentCount", is(1)));
+
+        mockMvc.perform(delete("/api/posts/" + postId + "/comments/" + commentId)
+                .header("Authorization", "Bearer " + writerToken))
+            .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/posts/" + postId + "/comments"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", hasSize(0)));
+
+        mockMvc.perform(delete("/api/posts/" + postId)
+                .header("Authorization", "Bearer " + writerToken))
+            .andExpect(status().isOk());
+    }
+
+    @Test
     void authenticatedUserCanUpdateFooterSettings() throws Exception {
         mockMvc.perform(get("/api/settings"))
             .andExpect(status().isOk())
