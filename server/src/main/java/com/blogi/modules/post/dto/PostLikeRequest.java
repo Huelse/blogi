@@ -2,15 +2,10 @@ package com.blogi.modules.post.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 
-public record PostCommentRequest(
+public record PostLikeRequest(
     @NotBlank(message = "浏览器指纹不能为空")
     @Pattern(regexp = "^[a-f0-9]{64}$", message = "浏览器指纹格式不正确")
-    String fingerprintHash,
-
-    @NotBlank(message = "评论内容不能为空")
-    @Size(max = 1200, message = "评论内容不能超过 1200 个字符")
-    String content
+    String fingerprintHash
 ) {
 }

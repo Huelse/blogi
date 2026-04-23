@@ -6,6 +6,8 @@ import com.blogi.modules.post.dto.PostCategoryResponse;
 import com.blogi.modules.post.dto.PostCommentRequest;
 import com.blogi.modules.post.dto.PostCommentResponse;
 import com.blogi.modules.post.dto.PostDetailResponse;
+import com.blogi.modules.post.dto.PostLikeRequest;
+import com.blogi.modules.post.dto.PostLikeStateResponse;
 import com.blogi.modules.post.dto.PostSummaryResponse;
 import com.blogi.modules.post.dto.PostTagResponse;
 import com.blogi.modules.post.dto.PostUpsertRequest;
@@ -70,10 +72,33 @@ public class PostController {
     @PostMapping("/{postId}/comments")
     public ApiResponse<PostCommentResponse> createComment(
         @PathVariable Long postId,
-        @AuthenticationPrincipal UserPrincipal principal,
         @Valid @RequestBody PostCommentRequest request
     ) {
-        return ApiResponse.ok(postService.createComment(postId, requireUserId(principal), request));
+        return ApiResponse.ok(postService.createComment(postId, request));
+    }
+
+    @GetMapping("/{postId}/likes")
+    public ApiResponse<PostLikeStateResponse> getLikeState(
+        @PathVariable Long postId,
+        @RequestParam(required = false) String fingerprintHash
+    ) {
+        return ApiResponse.ok(postService.getLikeState(postId, fingerprintHash));
+    }
+
+    @PostMapping("/{postId}/likes")
+    public ApiResponse<PostLikeStateResponse> likePost(
+        @PathVariable Long postId,
+        @Valid @RequestBody PostLikeRequest request
+    ) {
+        return ApiResponse.ok(postService.likePost(postId, request));
+    }
+
+    @DeleteMapping("/{postId}/likes")
+    public ApiResponse<PostLikeStateResponse> unlikePost(
+        @PathVariable Long postId,
+        @Valid @RequestBody PostLikeRequest request
+    ) {
+        return ApiResponse.ok(postService.unlikePost(postId, request));
     }
 
     @DeleteMapping("/{postId}/comments/{commentId}")

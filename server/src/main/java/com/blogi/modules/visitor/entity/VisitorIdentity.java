@@ -1,19 +1,18 @@
-package com.blogi.modules.post.entity;
+package com.blogi.modules.visitor.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
 
-@TableName("comments")
-public class PostComment {
+@TableName("visitors")
+public class VisitorIdentity {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long postId;
-    private Long authorId;
-    private Long visitorId;
-    private String content;
+    private String fingerprintHash;
+    private String displayName;
+    private String email;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -25,36 +24,28 @@ public class PostComment {
         this.id = id;
     }
 
-    public Long getPostId() {
-        return postId;
+    public String getFingerprintHash() {
+        return fingerprintHash;
     }
 
-    public void setPostId(Long postId) {
-        this.postId = postId;
+    public void setFingerprintHash(String fingerprintHash) {
+        this.fingerprintHash = fingerprintHash;
     }
 
-    public Long getAuthorId() {
-        return authorId;
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public void setAuthorId(Long authorId) {
-        this.authorId = authorId;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
-    public Long getVisitorId() {
-        return visitorId;
+    public String getEmail() {
+        return email;
     }
 
-    public void setVisitorId(Long visitorId) {
-        this.visitorId = visitorId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public LocalDateTime getCreatedAt() {

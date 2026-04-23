@@ -43,6 +43,7 @@ export interface PostSummary {
   category: PostCategory | null
   tags: PostTag[]
   commentCount: number
+  likeCount: number
 }
 
 export interface PostDetail extends PostSummary {
@@ -71,5 +72,37 @@ export interface PostComment {
 }
 
 export interface CommentPayload {
+  fingerprintHash: string
   content: string
+}
+
+export interface VisitorProfile {
+  id: number
+  fingerprintHash: string
+  displayName: string
+  email: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface VisitorProfilePayload {
+  displayName: string
+  email: string
+}
+
+export interface VisitorProfileRequest extends VisitorProfilePayload {
+  fingerprintHash: string
+}
+
+export interface VisitorResolvePayload {
+  fingerprintHash: string
+}
+
+export interface PostLikePayload {
+  fingerprintHash: string
+}
+
+export interface PostLikeState {
+  likeCount: number
+  liked: boolean
 }

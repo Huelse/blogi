@@ -130,7 +130,7 @@ class BlogiApiIntegrationTests {
     }
 
     @Test
-    void userCanCategorizeTagAndCommentOnPost() throws Exception {
+    void userCanCategorizeTagCommentAndLikePost() throws Exception {
         var writerResponse = mockMvc.perform(post("/api/auth/register")
                 .contentType(APPLICATION_JSON)
                 .content("""
@@ -184,44 +184,46 @@ class BlogiApiIntegrationTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data", hasSize(1)))
             .andExpect(jsonPath("$.data[0].title", is("Taxonomy Post")))
-            .andExpect(jsonPath("$.data[0].commentCount", is(0)));
+            .andExpect(jsonPath("$.data[0].commentCount", is(0)))
+            .andExpect(jsonPath("$.data[0].likeCount", is(0)));
+
+        var visitorFingerprint = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
         mockMvc.perform(post("/api/posts/" + postId + "/comments")
                 .contentType(APPLICATION_JSON)
                 .content("""
                     {
-                      "content": "Needs a token."
+                      "fingerprintHash": "%s",
+                      "content": "Needs a visitor profile."
                     }
-                    """))
-            .andExpect(status().isUnauthorized());
+                    """.formatted(visitorFingerprint)))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message", is("请先填写昵称和邮箱")));
 
-        var commenterResponse = mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(put("/api/visitors/profile")
                 .contentType(APPLICATION_JSON)
                 .content("""
                     {
-                      "username": "commenter",
-                      "displayName": "Commenter",
-                      "password": "password123"
+                      "fingerprintHash": "%s",
+                      "displayName": "Visitor One",
+                      "email": "VISITOR@example.com"
                     }
-                    """))
+                    """.formatted(visitorFingerprint)))
             .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-        var commenterToken = JsonTestUtils.read(commenterResponse, "$.data.token");
+            .andExpect(jsonPath("$.data.displayName", is("Visitor One")))
+            .andExpect(jsonPath("$.data.email", is("visitor@example.com")));
 
         var commentResponse = mockMvc.perform(post("/api/posts/" + postId + "/comments")
-                .header("Authorization", "Bearer " + commenterToken)
                 .contentType(APPLICATION_JSON)
                 .content("""
                     {
+                      "fingerprintHash": "%s",
                       "content": "Great article."
                     }
-                    """))
+                    """.formatted(visitorFingerprint)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data.content", is("Great article.")))
-            .andExpect(jsonPath("$.data.author.username", is("commenter")))
+            .andExpect(jsonPath("$.data.author.displayName", is("Visitor One")))
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -235,7 +237,63 @@ class BlogiApiIntegrationTests {
 
         mockMvc.perform(get("/api/posts/" + postId))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data.commentCount", is(1)));
+            .andExpect(jsonPath("$.data.commentCount", is(1)))
+            .andExpect(jsonPath("$.data.likeCount", is(0)));
+
+        mockMvc.perform(get("/api/posts/" + postId + "/likes")
+                .queryParam("fingerprintHash", visitorFingerprint))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.likeCount", is(0)))
+            .andExpect(jsonPath("$.data.liked", is(false)));
+
+        mockMvc.perform(post("/api/posts/" + postId + "/likes")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "fingerprintHash": "%s"
+                    }
+                    """.formatted(visitorFingerprint)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.likeCount", is(1)))
+            .andExpect(jsonPath("$.data.liked", is(true)));
+
+        mockMvc.perform(post("/api/posts/" + postId + "/likes")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "fingerprintHash": "%s"
+                    }
+                    """.formatted(visitorFingerprint)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.likeCount", is(1)))
+            .andExpect(jsonPath("$.data.liked", is(true)));
+
+        mockMvc.perform(get("/api/posts/" + postId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.likeCount", is(1)));
+
+        mockMvc.perform(put("/api/visitors/profile")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "fingerprintHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+                      "displayName": "Visitor Two",
+                      "email": "visitor@example.com"
+                    }
+                    """))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.message", is("该邮箱已被使用")));
+
+        mockMvc.perform(delete("/api/posts/" + postId + "/likes")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "fingerprintHash": "%s"
+                    }
+                    """.formatted(visitorFingerprint)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.likeCount", is(0)))
+            .andExpect(jsonPath("$.data.liked", is(false)));
 
         mockMvc.perform(delete("/api/posts/" + postId + "/comments/" + commentId)
                 .header("Authorization", "Bearer " + writerToken))

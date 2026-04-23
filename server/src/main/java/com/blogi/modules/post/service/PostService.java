@@ -9,19 +9,26 @@ import com.blogi.modules.post.dto.PostCategoryResponse;
 import com.blogi.modules.post.dto.PostCommentRequest;
 import com.blogi.modules.post.dto.PostCommentResponse;
 import com.blogi.modules.post.dto.PostDetailResponse;
+import com.blogi.modules.post.dto.PostLikeRequest;
+import com.blogi.modules.post.dto.PostLikeStateResponse;
 import com.blogi.modules.post.dto.PostSummaryResponse;
 import com.blogi.modules.post.dto.PostTagResponse;
 import com.blogi.modules.post.dto.PostUpsertRequest;
 import com.blogi.modules.post.entity.PostArticle;
 import com.blogi.modules.post.entity.PostCategory;
 import com.blogi.modules.post.entity.PostComment;
+import com.blogi.modules.post.entity.PostLike;
 import com.blogi.modules.post.entity.PostTag;
 import com.blogi.modules.post.entity.PostTagRelation;
 import com.blogi.modules.post.mapper.PostArticleMapper;
 import com.blogi.modules.post.mapper.PostCategoryMapper;
 import com.blogi.modules.post.mapper.PostCommentMapper;
+import com.blogi.modules.post.mapper.PostLikeMapper;
 import com.blogi.modules.post.mapper.PostTagMapper;
 import com.blogi.modules.post.mapper.PostTagRelationMapper;
+import com.blogi.modules.visitor.entity.VisitorIdentity;
+import com.blogi.modules.visitor.mapper.VisitorIdentityMapper;
+import com.blogi.modules.visitor.service.VisitorService;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,6 +53,9 @@ public class PostService {
     private final PostTagMapper postTagMapper;
     private final PostTagRelationMapper postTagRelationMapper;
     private final PostCommentMapper postCommentMapper;
+    private final PostLikeMapper postLikeMapper;
+    private final VisitorIdentityMapper visitorIdentityMapper;
+    private final VisitorService visitorService;
 
     public PostService(
         PostArticleMapper postArticleMapper,
@@ -53,7 +63,10 @@ public class PostService {
         PostCategoryMapper postCategoryMapper,
         PostTagMapper postTagMapper,
         PostTagRelationMapper postTagRelationMapper,
-        PostCommentMapper postCommentMapper
+        PostCommentMapper postCommentMapper,
+        PostLikeMapper postLikeMapper,
+        VisitorIdentityMapper visitorIdentityMapper,
+        VisitorService visitorService
     ) {
         this.postArticleMapper = postArticleMapper;
         this.userAccountMapper = userAccountMapper;
@@ -61,6 +74,9 @@ public class PostService {
         this.postTagMapper = postTagMapper;
         this.postTagRelationMapper = postTagRelationMapper;
         this.postCommentMapper = postCommentMapper;
+        this.postLikeMapper = postLikeMapper;
+        this.visitorIdentityMapper = visitorIdentityMapper;
+        this.visitorService = visitorService;
     }
 
     public List<PostSummaryResponse> listPosts(String categorySlug, String tagSlug) {
@@ -167,17 +183,46 @@ public class PostService {
         return toCommentResponses(comments);
     }
 
-    public PostCommentResponse createComment(Long postId, Long authorId, PostCommentRequest request) {
+    public PostCommentResponse createComment(Long postId, PostCommentRequest request) {
         getRequiredPost(postId);
+        var visitor = visitorService.requireVisitor(request.fingerprintHash());
         var now = LocalDateTime.now();
         var comment = new PostComment();
         comment.setPostId(postId);
-        comment.setAuthorId(authorId);
+        comment.setVisitorId(visitor.getId());
         comment.setContent(request.content().trim());
         comment.setCreatedAt(now);
         comment.setUpdatedAt(now);
         postCommentMapper.insert(comment);
-        return toCommentResponse(comment, userAccountMapper.selectById(authorId));
+        return toCommentResponse(comment, null, visitor);
+    }
+
+    public PostLikeStateResponse getLikeState(Long postId, String fingerprintHash) {
+        getRequiredPost(postId);
+        var visitor = visitorService.findByFingerprint(fingerprintHash);
+        return toLikeState(postId, visitor);
+    }
+
+    public PostLikeStateResponse likePost(Long postId, PostLikeRequest request) {
+        getRequiredPost(postId);
+        var visitor = visitorService.requireVisitor(request.fingerprintHash());
+        if (!hasLike(postId, visitor.getId())) {
+            var like = new PostLike();
+            like.setPostId(postId);
+            like.setVisitorId(visitor.getId());
+            like.setCreatedAt(LocalDateTime.now());
+            postLikeMapper.insert(like);
+        }
+        return toLikeState(postId, visitor);
+    }
+
+    public PostLikeStateResponse unlikePost(Long postId, PostLikeRequest request) {
+        getRequiredPost(postId);
+        var visitor = visitorService.requireVisitor(request.fingerprintHash());
+        postLikeMapper.delete(new LambdaQueryWrapper<PostLike>()
+            .eq(PostLike::getPostId, postId)
+            .eq(PostLike::getVisitorId, visitor.getId()));
+        return toLikeState(postId, visitor);
     }
 
     public void deleteComment(Long postId, Long commentId, Long currentUserId) {
@@ -221,6 +266,7 @@ public class PostService {
         var categoriesById = getCategoriesById(posts);
         var tagsByPostId = getTagsByPostIds(posts);
         var commentCountsByPostId = getCommentCountsByPostIds(posts);
+        var likeCountsByPostId = getLikeCountsByPostIds(posts);
         return posts.stream()
             .map(post -> new PostSummaryResponse(
                 post.getId(),
@@ -231,7 +277,8 @@ public class PostService {
                 toAuthor(usersById.get(post.getAuthorId())),
                 toCategory(categoriesById.get(post.getCategoryId())),
                 tagsByPostId.getOrDefault(post.getId(), List.of()),
-                commentCountsByPostId.getOrDefault(post.getId(), 0L)
+                commentCountsByPostId.getOrDefault(post.getId(), 0L),
+                likeCountsByPostId.getOrDefault(post.getId(), 0L)
             ))
             .toList();
     }
@@ -250,7 +297,8 @@ public class PostService {
             toCategory(category),
             getTagsByPostId(post.getId()),
             postCommentMapper.selectCount(new LambdaQueryWrapper<PostComment>()
-                .eq(PostComment::getPostId, post.getId()))
+                .eq(PostComment::getPostId, post.getId())),
+            getLikeCount(post.getId())
         );
     }
 
@@ -260,19 +308,24 @@ public class PostService {
         }
 
         var usersById = getUsersByIdFromComments(comments);
+        var visitorsById = getVisitorsByIdFromComments(comments);
         return comments.stream()
-            .map(comment -> toCommentResponse(comment, usersById.get(comment.getAuthorId())))
+            .map(comment -> toCommentResponse(
+                comment,
+                usersById.get(comment.getAuthorId()),
+                visitorsById.get(comment.getVisitorId())
+            ))
             .toList();
     }
 
-    private PostCommentResponse toCommentResponse(PostComment comment, UserAccount author) {
+    private PostCommentResponse toCommentResponse(PostComment comment, UserAccount author, VisitorIdentity visitor) {
         return new PostCommentResponse(
             comment.getId(),
             comment.getPostId(),
             comment.getContent(),
             comment.getCreatedAt(),
             comment.getUpdatedAt(),
-            toAuthor(author)
+            toCommentAuthor(author, visitor)
         );
     }
 
@@ -302,6 +355,21 @@ public class PostService {
         return userAccountMapper.selectBatchIds(authorIds)
             .stream()
             .collect(Collectors.toMap(UserAccount::getId, Function.identity()));
+    }
+
+    private Map<Long, VisitorIdentity> getVisitorsByIdFromComments(List<PostComment> comments) {
+        var visitorIds = comments.stream()
+            .map(PostComment::getVisitorId)
+            .filter(Objects::nonNull)
+            .distinct()
+            .toList();
+        if (visitorIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return visitorIdentityMapper.selectBatchIds(visitorIds)
+            .stream()
+            .collect(Collectors.toMap(VisitorIdentity::getId, Function.identity()));
     }
 
     private Map<Long, PostCategory> getCategoriesById(List<PostArticle> posts) {
@@ -382,11 +450,56 @@ public class PostService {
             .collect(Collectors.groupingBy(PostComment::getPostId, Collectors.counting()));
     }
 
+    private Map<Long, Long> getLikeCountsByPostIds(List<PostArticle> posts) {
+        var postIds = posts.stream()
+            .map(PostArticle::getId)
+            .filter(Objects::nonNull)
+            .distinct()
+            .toList();
+        if (postIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        return postLikeMapper.selectList(new LambdaQueryWrapper<PostLike>()
+                .select(PostLike::getPostId)
+                .in(PostLike::getPostId, postIds))
+            .stream()
+            .collect(Collectors.groupingBy(PostLike::getPostId, Collectors.counting()));
+    }
+
+    private PostLikeStateResponse toLikeState(Long postId, VisitorIdentity visitor) {
+        return new PostLikeStateResponse(
+            getLikeCount(postId),
+            visitor != null && hasLike(postId, visitor.getId())
+        );
+    }
+
+    private long getLikeCount(Long postId) {
+        return postLikeMapper.selectCount(new LambdaQueryWrapper<PostLike>()
+            .eq(PostLike::getPostId, postId));
+    }
+
+    private boolean hasLike(Long postId, Long visitorId) {
+        return postLikeMapper.selectCount(new LambdaQueryWrapper<PostLike>()
+            .eq(PostLike::getPostId, postId)
+            .eq(PostLike::getVisitorId, visitorId)) > 0;
+    }
+
     private PostAuthorResponse toAuthor(UserAccount user) {
         if (user == null) {
             throw new ApiException(404, "作者不存在");
         }
         return new PostAuthorResponse(user.getId(), user.getUsername(), user.getDisplayName());
+    }
+
+    private PostAuthorResponse toCommentAuthor(UserAccount user, VisitorIdentity visitor) {
+        if (user != null) {
+            return toAuthor(user);
+        }
+        if (visitor != null) {
+            return new PostAuthorResponse(visitor.getId(), "visitor-" + visitor.getId(), visitor.getDisplayName());
+        }
+        throw new ApiException(404, "评论作者不存在");
     }
 
     private PostCategoryResponse toCategory(PostCategory category) {

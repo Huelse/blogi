@@ -44,11 +44,15 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/health", "/api/auth/login", "/api/auth/register").permitAll()
+                .requestMatchers("/api/visitors/**").permitAll()
                 .requestMatchers("/api/auth/me").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/settings").permitAll()
                 .requestMatchers("/api/posts/mine").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/posts").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/posts/*/comments").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/posts/*/likes").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/posts/*/likes").permitAll()
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex

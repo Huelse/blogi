@@ -4,6 +4,7 @@ import {
   ChatBubbleLeftEllipsisIcon,
   ExclamationTriangleIcon,
   FolderIcon,
+  HeartIcon,
   TagIcon,
 } from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
@@ -178,6 +179,10 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
                   <ChatBubbleLeftEllipsisIcon aria-hidden="true" class="size-4" />
                   {{ post.commentCount }}
                 </span>
+                <span class="inline-flex items-center gap-1.5">
+                  <HeartIcon aria-hidden="true" class="size-4" />
+                  {{ post.likeCount }}
+                </span>
               </div>
               <span
                 :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
@@ -205,6 +210,10 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
                 <span class="inline-flex items-center gap-1.5">
                   <ChatBubbleLeftEllipsisIcon aria-hidden="true" class="size-4" />
                   {{ post.commentCount }}
+                </span>
+                <span class="inline-flex items-center gap-1.5">
+                  <HeartIcon aria-hidden="true" class="size-4" />
+                  {{ post.likeCount }}
                 </span>
               </div>
               <h2 class="text-title mt-4 text-2xl font-semibold tracking-tight md:text-3xl">

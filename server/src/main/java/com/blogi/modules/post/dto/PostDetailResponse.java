@@ -13,6 +13,7 @@ public record PostDetailResponse(
     PostAuthorResponse author,
     PostCategoryResponse category,
     List<PostTagResponse> tags,
-    long commentCount
+    long commentCount,
+    long likeCount
 ) {
 }

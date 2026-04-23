@@ -4,13 +4,20 @@ import {
   ChatBubbleLeftEllipsisIcon,
   ExclamationTriangleIcon,
   FolderIcon,
+  HeartIcon,
   PaperAirplaneIcon,
   PencilSquareIcon,
   TagIcon,
   TrashIcon,
 } from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
-import type { CommentPayload, PostComment, PostDetail } from '~/types/blogi'
+import type {
+  CommentPayload,
+  PostComment,
+  PostDetail,
+  PostLikePayload,
+  PostLikeState,
+} from '~/types/blogi'
 import { formatDateTime } from '~/utils/date'
 import { getErrorMessage } from '~/utils/errors'
 import { renderMarkdown } from '~/utils/markdown'
@@ -18,12 +25,18 @@ import { renderMarkdown } from '~/utils/markdown'
 const route = useRoute()
 const api = useApiClient()
 const auth = useAuth()
+const visitor = useVisitorIdentity()
 
 const postId = computed(() => String(route.params.id))
 const commentContent = ref('')
 const commentPending = ref(false)
 const commentError = ref('')
 const deletingCommentId = ref<number | null>(null)
+const likeState = ref<PostLikeState | null>(null)
+const likePending = ref(false)
+const likeError = ref('')
+const profileDialogOpen = ref(false)
+const pendingVisitorAction = ref<'comment' | 'like' | null>(null)
 
 const { data: post, error } = await useAsyncData(
   () => `post-${postId.value}`,
@@ -40,7 +53,17 @@ const {
 
 const html = computed(() => renderMarkdown(post.value?.contentMarkdown ?? ''))
 const isOwner = computed(() => post.value?.author.id === auth.user.value?.id)
-const loginTarget = computed(() => `/login?redirect=${encodeURIComponent(route.fullPath)}`)
+const likeCount = computed(() => likeState.value?.likeCount ?? post.value?.likeCount ?? 0)
+const liked = computed(() => likeState.value?.liked ?? false)
+
+onMounted(async () => {
+  try {
+    await visitor.loadProfile()
+    await refreshLikeState()
+  } catch {
+    // Interaction errors are surfaced when the user actively comments or likes.
+  }
+})
 
 async function submitComment() {
   const content = commentContent.value.trim()
@@ -48,13 +71,18 @@ async function submitComment() {
     return
   }
 
+  if (!(await ensureVisitorProfile('comment'))) {
+    return
+  }
+
   commentPending.value = true
   commentError.value = ''
 
   try {
+    const fingerprintHash = await visitor.ensureFingerprintHash()
     await api<PostComment>(`/posts/${postId.value}/comments`, {
       method: 'POST',
-      body: { content } satisfies CommentPayload,
+      body: { fingerprintHash, content } satisfies CommentPayload,
     })
     commentContent.value = ''
     await refreshComments()
@@ -63,6 +91,32 @@ async function submitComment() {
     commentError.value = getErrorMessage(saveError)
   } finally {
     commentPending.value = false
+  }
+}
+
+async function toggleLike() {
+  if (likePending.value) {
+    return
+  }
+
+  if (!(await ensureVisitorProfile('like'))) {
+    return
+  }
+
+  likePending.value = true
+  likeError.value = ''
+
+  try {
+    const fingerprintHash = await visitor.ensureFingerprintHash()
+    const state = await api<PostLikeState>(`/posts/${postId.value}/likes`, {
+      method: liked.value ? 'DELETE' : 'POST',
+      body: { fingerprintHash } satisfies PostLikePayload,
+    })
+    applyLikeState(state)
+  } catch (error) {
+    likeError.value = getErrorMessage(error)
+  } finally {
+    likePending.value = false
   }
 }
 
@@ -91,12 +145,70 @@ async function removeComment(comment: PostComment) {
 
 function canDeleteComment(comment: PostComment) {
   const currentUserId = auth.user.value?.id
-  return currentUserId === comment.author.id || currentUserId === post.value?.author.id
+  const isVisitorComment = comment.author.username.startsWith('visitor-')
+  return (
+    currentUserId === post.value?.author.id ||
+    (!isVisitorComment && currentUserId === comment.author.id)
+  )
 }
 
 function syncCommentCount() {
   if (post.value) {
     post.value.commentCount = comments.value?.length ?? post.value.commentCount
+  }
+}
+
+async function refreshLikeState() {
+  if (!import.meta.client) {
+    return
+  }
+
+  const fingerprintHash = await visitor.ensureFingerprintHash()
+  const state = await api<PostLikeState>(`/posts/${postId.value}/likes`, {
+    query: { fingerprintHash },
+  })
+  applyLikeState(state)
+}
+
+function applyLikeState(state: PostLikeState) {
+  likeState.value = state
+  if (post.value) {
+    post.value.likeCount = state.likeCount
+  }
+}
+
+async function ensureVisitorProfile(action: 'comment' | 'like') {
+  try {
+    const profile = await visitor.loadProfile(true)
+    if (profile) {
+      return true
+    }
+
+    pendingVisitorAction.value = action
+    profileDialogOpen.value = true
+    return false
+  } catch (error) {
+    const message = getErrorMessage(error)
+    if (action === 'comment') {
+      commentError.value = message
+    } else {
+      likeError.value = message
+    }
+    return false
+  }
+}
+
+async function handleVisitorProfileSaved() {
+  const action = pendingVisitorAction.value
+  pendingVisitorAction.value = null
+
+  if (action === 'comment') {
+    await submitComment()
+    return
+  }
+
+  if (action === 'like') {
+    await toggleLike()
   }
 }
 </script>
@@ -118,6 +230,10 @@ function syncCommentCount() {
             <span class="inline-flex items-center gap-1.5">
               <ChatBubbleLeftEllipsisIcon aria-hidden="true" class="size-4" />
               {{ post.commentCount }}
+            </span>
+            <span class="inline-flex items-center gap-1.5">
+              <HeartIcon aria-hidden="true" class="size-4" />
+              {{ likeCount }}
             </span>
           </div>
           <h1 class="text-title mt-5 text-4xl font-semibold tracking-tight md:text-5xl">
@@ -152,6 +268,15 @@ function syncCommentCount() {
               <ArrowLeftIcon aria-hidden="true" class="size-4" />
               返回列表
             </NuxtLink>
+            <UiButton
+              :disabled="likePending"
+              :variant="liked ? 'default' : 'secondary'"
+              type="button"
+              @click="toggleLike"
+            >
+              <HeartIcon aria-hidden="true" class="size-4" />
+              {{ likePending ? '处理中...' : liked ? '已点赞' : '点赞' }}
+            </UiButton>
             <NuxtLink v-if="isOwner" :class="buttonVariants()" :to="`/admin/posts/${post.id}/edit`">
               <PencilSquareIcon aria-hidden="true" class="size-4" />
               后台编辑
@@ -177,18 +302,18 @@ function syncCommentCount() {
             <UiBadge variant="muted">{{ comments?.length ?? post.commentCount }} 条</UiBadge>
           </div>
 
-          <UiAlert v-if="commentsError || commentError" class="mt-6" variant="destructive">
+          <UiAlert
+            v-if="commentsError || commentError || likeError"
+            class="mt-6"
+            variant="destructive"
+          >
             <UiAlertDescription class="flex items-start gap-2">
               <ExclamationTriangleIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
-              <span>{{ commentError || '评论加载失败，请稍后重试。' }}</span>
+              <span>{{ commentError || likeError || '评论加载失败，请稍后重试。' }}</span>
             </UiAlertDescription>
           </UiAlert>
 
-          <form
-            v-if="auth.isAuthenticated.value"
-            class="mt-6 space-y-3"
-            @submit.prevent="submitComment"
-          >
+          <form class="mt-6 space-y-3" @submit.prevent="submitComment">
             <UiLabel for="comment">发表评论</UiLabel>
             <UiTextarea
               id="comment"
@@ -203,16 +328,6 @@ function syncCommentCount() {
               {{ commentPending ? '发布中...' : '发布评论' }}
             </UiButton>
           </form>
-
-          <div
-            v-else
-            class="mt-6 rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-soft-bg)] px-5 py-4 text-sm text-[var(--body)]"
-          >
-            <NuxtLink :class="buttonVariants({ variant: 'link' })" :to="loginTarget">
-              登录
-            </NuxtLink>
-            后参与评论。
-          </div>
 
           <div
             v-if="!comments?.length"
@@ -249,6 +364,7 @@ function syncCommentCount() {
       </UiCard>
     </section>
 
+    <VisitorProfileDialog v-model:open="profileDialogOpen" @saved="handleVisitorProfileSaved" />
     <SiteFooter />
   </main>
 </template>
