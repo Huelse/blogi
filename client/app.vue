@@ -3,6 +3,7 @@ import {
   ArrowRightOnRectangleIcon,
   Cog6ToothIcon,
   HomeIcon,
+  LanguageIcon,
   MoonIcon,
   SunIcon,
   UserCircleIcon,
@@ -11,12 +12,23 @@ import { buttonVariants } from '~/components/ui/button/buttonVariants'
 
 const auth = useAuth()
 const theme = useTheme()
+const { locale, setLocale, t } = useI18n()
 
-const nextThemeLabel = computed(() => (theme.isDark.value ? '浅色' : '深色'))
+const nextThemeLabel = computed(() =>
+  theme.isDark.value ? t('app.theme.light') : t('app.theme.dark'),
+)
+const nextLocaleCode = computed(() => (locale.value === 'zh' ? 'en' : 'zh'))
+const nextLocaleLabel = computed(() =>
+  nextLocaleCode.value === 'zh' ? t('common.language.zh') : t('common.language.en'),
+)
 
 async function logout() {
   auth.clearSession()
   await navigateTo('/')
+}
+
+async function toggleLocale() {
+  await setLocale(nextLocaleCode.value)
 }
 </script>
 
@@ -36,12 +48,24 @@ async function logout() {
             to="/"
           >
             <HomeIcon aria-hidden="true" class="size-4" />
-            首页
+            {{ t('app.home') }}
           </NuxtLink>
           <UiButton
             size="sm"
             variant="secondary"
-            :aria-label="theme.isDark.value ? '切换到明亮主题' : '切换到黑暗主题'"
+            :aria-label="t('app.languageSwitch', { locale: nextLocaleLabel })"
+            type="button"
+            @click="toggleLocale"
+          >
+            <LanguageIcon aria-hidden="true" class="size-4" />
+            {{ nextLocaleLabel }}
+          </UiButton>
+          <UiButton
+            size="sm"
+            variant="secondary"
+            :aria-label="
+              theme.isDark.value ? t('app.theme.switchToLight') : t('app.theme.switchToDark')
+            "
             type="button"
             @click="theme.toggleTheme()"
           >
@@ -55,7 +79,7 @@ async function logout() {
           <template v-if="auth.isAuthenticated.value && auth.user.value">
             <NuxtLink :class="buttonVariants({ variant: 'secondary', size: 'sm' })" to="/admin">
               <Cog6ToothIcon aria-hidden="true" class="size-4" />
-              后台管理
+              {{ t('app.admin') }}
             </NuxtLink>
             <UiBadge class="hidden md:inline-flex" variant="muted">
               <UserCircleIcon aria-hidden="true" class="size-4" />
@@ -63,7 +87,7 @@ async function logout() {
             </UiBadge>
             <UiButton size="sm" variant="secondary" type="button" @click="logout">
               <ArrowRightOnRectangleIcon aria-hidden="true" class="size-4" />
-              退出
+              {{ t('app.logout') }}
             </UiButton>
           </template>
         </div>

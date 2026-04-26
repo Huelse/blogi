@@ -15,33 +15,34 @@ defineProps<{
 
 const route = useRoute()
 const auth = useAuth()
+const { t } = useI18n()
 
-const adminNav = [
+const adminNav = computed(() => [
   {
-    label: '概览',
+    label: t('admin.nav.overview'),
     to: '/admin',
     icon: HomeIcon,
     exact: true,
   },
   {
-    label: '文章管理',
+    label: t('admin.nav.posts'),
     to: '/admin/posts',
     icon: DocumentTextIcon,
     exact: true,
   },
   {
-    label: '写文章',
+    label: t('admin.nav.newPost'),
     to: '/admin/posts/new',
     icon: PencilSquareIcon,
   },
   {
-    label: '博客设置',
+    label: t('admin.nav.settings'),
     to: '/admin/settings',
     icon: Cog6ToothIcon,
   },
-]
+])
 
-function isActive(item: (typeof adminNav)[number]) {
+function isActive(item: { to: string; exact?: boolean }) {
   return item.exact ? route.path === item.to : route.path.startsWith(item.to)
 }
 
@@ -57,11 +58,13 @@ async function logout() {
       class="rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-bg)] p-4 backdrop-blur"
     >
       <div class="border-b border-[var(--panel-border)] pb-4">
-        <p class="text-brand text-xs font-semibold uppercase tracking-[0.3em]">Admin</p>
+        <p class="text-brand text-xs font-semibold uppercase tracking-[0.3em]">
+          {{ t('app.admin') }}
+        </p>
         <p v-if="auth.user.value" class="text-title mt-3 text-lg font-semibold">
           {{ auth.user.value.displayName }}
         </p>
-        <p class="text-muted mt-1 text-sm">后台管理</p>
+        <p class="text-muted mt-1 text-sm">{{ t('admin.shell.subtitle') }}</p>
       </div>
 
       <nav class="mt-4 space-y-1">
@@ -84,7 +87,7 @@ async function logout() {
       <div class="mt-6 border-t border-[var(--panel-border)] pt-4">
         <UiButton class="w-full justify-start" type="button" variant="ghost" @click="logout">
           <ArrowLeftOnRectangleIcon aria-hidden="true" class="size-4" />
-          退出登录
+          {{ t('app.logout') }}
         </UiButton>
       </div>
     </aside>
@@ -99,7 +102,7 @@ async function logout() {
               class="flex items-center gap-2 text-brand text-xs font-semibold uppercase tracking-[0.24em]"
             >
               <Cog6ToothIcon aria-hidden="true" class="size-4" />
-              管理设置
+              {{ t('admin.shell.eyebrow') }}
             </div>
             <h1 class="text-title mt-3 text-3xl font-semibold tracking-tight">{{ title }}</h1>
             <p v-if="description" class="text-muted mt-2 max-w-3xl text-sm leading-7">
@@ -109,7 +112,7 @@ async function logout() {
 
           <NuxtLink :class="buttonVariants({ size: 'sm' })" to="/admin/posts/new">
             <PencilSquareIcon aria-hidden="true" class="size-4" />
-            写文章
+            {{ t('admin.nav.newPost') }}
           </NuxtLink>
         </div>
       </div>

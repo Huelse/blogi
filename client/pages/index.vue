@@ -14,6 +14,7 @@ import { formatDateTime } from '~/utils/date'
 const route = useRoute()
 const api = useApiClient()
 const blogSettings = useBlogSettings()
+const { locale, t } = useI18n()
 const selectedCategorySlug = computed(() =>
   typeof route.query.category === 'string' ? route.query.category : '',
 )
@@ -63,7 +64,7 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
       <UiAlert v-if="error" class="px-6 py-5" variant="destructive">
         <UiAlertDescription class="flex items-start gap-2">
           <ExclamationTriangleIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
-          <span>文章列表加载失败，请确认后端已启动。</span>
+          <span>{{ t('home.loadError') }}</span>
         </UiAlertDescription>
       </UiAlert>
 
@@ -80,14 +81,14 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
               :to="{ path: '/' }"
             >
               <BookOpenIcon aria-hidden="true" class="size-4" />
-              全部文章
+              {{ t('home.allPosts') }}
             </NuxtLink>
           </div>
 
           <div v-if="categories?.length" class="mt-4 flex flex-wrap items-center gap-2">
             <span class="text-subtle inline-flex items-center gap-1.5 text-xs">
               <FolderIcon aria-hidden="true" class="size-4" />
-              分类
+              {{ t('home.categories') }}
             </span>
             <NuxtLink
               v-for="category in categories"
@@ -108,7 +109,7 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
           <div v-if="tags?.length" class="mt-4 flex flex-wrap items-center gap-2">
             <span class="text-subtle inline-flex items-center gap-1.5 text-xs">
               <TagIcon aria-hidden="true" class="size-4" />
-              标签
+              {{ t('home.tags') }}
             </span>
             <NuxtLink
               v-for="tag in tags"
@@ -131,14 +132,14 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
           v-if="pending"
           class="border-t border-[var(--panel-border)] py-8 text-sm text-[var(--body)]"
         >
-          文章列表加载中...
+          {{ t('home.loading') }}
         </div>
 
         <div
           v-else-if="!sortedPosts.length"
           class="border-t border-[var(--panel-border)] py-8 text-sm leading-7 text-[var(--body)]"
         >
-          还没有文章。
+          {{ t('home.empty') }}
         </div>
 
         <div v-else-if="isCardLayout" class="grid gap-4 md:grid-cols-2">
@@ -174,7 +175,7 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
             >
               <div class="meta-row order-2 sm:order-1">
                 <span>{{ post.author.displayName }}</span>
-                <span>{{ formatDateTime(post.updatedAt) }}</span>
+                <span>{{ formatDateTime(post.updatedAt, locale) }}</span>
                 <span class="inline-flex items-center gap-1.5">
                   <ChatBubbleLeftEllipsisIcon aria-hidden="true" class="size-4" />
                   {{ post.commentCount }}
@@ -190,7 +191,7 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
                 class="order-1 self-start sm:order-2 sm:self-auto"
               >
                 <BookOpenIcon aria-hidden="true" class="size-4" />
-                阅读全文
+                {{ t('home.readMore') }}
               </span>
             </div>
           </NuxtLink>
@@ -206,7 +207,7 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
             <div>
               <div class="meta-row">
                 <span>{{ post.author.displayName }}</span>
-                <span>{{ formatDateTime(post.updatedAt) }}</span>
+                <span>{{ formatDateTime(post.updatedAt, locale) }}</span>
                 <span class="inline-flex items-center gap-1.5">
                   <ChatBubbleLeftEllipsisIcon aria-hidden="true" class="size-4" />
                   {{ post.commentCount }}
@@ -246,7 +247,7 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
                 aria-hidden="true"
               >
                 <BookOpenIcon aria-hidden="true" class="size-4" />
-                阅读全文
+                {{ t('home.readMore') }}
               </span>
             </div>
           </NuxtLink>

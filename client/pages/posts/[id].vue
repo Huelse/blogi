@@ -26,6 +26,7 @@ const route = useRoute()
 const api = useApiClient()
 const auth = useAuth()
 const visitor = useVisitorIdentity()
+const { locale, t } = useI18n()
 
 const postId = computed(() => String(route.params.id))
 const commentContent = ref('')
@@ -88,7 +89,7 @@ async function submitComment() {
     await refreshComments()
     syncCommentCount()
   } catch (saveError) {
-    commentError.value = getErrorMessage(saveError)
+    commentError.value = getErrorMessage(saveError, t('common.requestFailed'))
   } finally {
     commentPending.value = false
   }
@@ -114,7 +115,7 @@ async function toggleLike() {
     })
     applyLikeState(state)
   } catch (error) {
-    likeError.value = getErrorMessage(error)
+    likeError.value = getErrorMessage(error, t('common.requestFailed'))
   } finally {
     likePending.value = false
   }
@@ -125,7 +126,7 @@ async function removeComment(comment: PostComment) {
     return
   }
 
-  if (!window.confirm('确定删除这条评论吗？')) {
+  if (!window.confirm(t('post.deleteCommentConfirm'))) {
     return
   }
 
@@ -137,7 +138,7 @@ async function removeComment(comment: PostComment) {
     await refreshComments()
     syncCommentCount()
   } catch (deleteError) {
-    commentError.value = getErrorMessage(deleteError)
+    commentError.value = getErrorMessage(deleteError, t('common.requestFailed'))
   } finally {
     deletingCommentId.value = null
   }
@@ -188,7 +189,7 @@ async function ensureVisitorProfile(action: 'comment' | 'like') {
     profileDialogOpen.value = true
     return false
   } catch (error) {
-    const message = getErrorMessage(error)
+    const message = getErrorMessage(error, t('common.requestFailed'))
     if (action === 'comment') {
       commentError.value = message
     } else {
@@ -219,14 +220,14 @@ async function handleVisitorProfileSaved() {
       <UiAlert v-if="error || !post" variant="destructive">
         <UiAlertDescription class="flex items-start gap-2">
           <ExclamationTriangleIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
-          <span>文章不存在，或后端尚未启动。</span>
+          <span>{{ t('post.loadError') }}</span>
         </UiAlertDescription>
       </UiAlert>
       <UiCard v-else class="overflow-hidden">
         <div class="px-8 py-8 md:px-10">
           <div class="meta-row">
             <span>{{ post.author.displayName }}</span>
-            <span>{{ formatDateTime(post.updatedAt) }}</span>
+            <span>{{ formatDateTime(post.updatedAt, locale) }}</span>
             <span class="inline-flex items-center gap-1.5">
               <ChatBubbleLeftEllipsisIcon aria-hidden="true" class="size-4" />
               {{ post.commentCount }}
@@ -266,7 +267,7 @@ async function handleVisitorProfileSaved() {
           <div class="mt-8 flex flex-wrap gap-3">
             <NuxtLink :class="buttonVariants({ variant: 'secondary' })" to="/">
               <ArrowLeftIcon aria-hidden="true" class="size-4" />
-              返回列表
+              {{ t('post.backToList') }}
             </NuxtLink>
             <UiButton
               :disabled="likePending"
@@ -275,11 +276,11 @@ async function handleVisitorProfileSaved() {
               @click="toggleLike"
             >
               <HeartIcon aria-hidden="true" class="size-4" />
-              {{ likePending ? '处理中...' : liked ? '已点赞' : '点赞' }}
+              {{ likePending ? t('post.liking') : liked ? t('post.liked') : t('post.like') }}
             </UiButton>
             <NuxtLink v-if="isOwner" :class="buttonVariants()" :to="`/admin/posts/${post.id}/edit`">
               <PencilSquareIcon aria-hidden="true" class="size-4" />
-              后台编辑
+              {{ t('post.editInAdmin') }}
             </NuxtLink>
           </div>
         </div>
@@ -296,10 +297,14 @@ async function handleVisitorProfileSaved() {
         <div class="px-8 py-10 md:px-10">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p class="text-subtle text-sm uppercase tracking-[0.24em]">Comments</p>
-              <h2 class="text-title mt-2 text-2xl font-semibold">评论</h2>
+              <p class="text-subtle text-sm uppercase tracking-[0.24em]">
+                {{ t('post.comments.eyebrow') }}
+              </p>
+              <h2 class="text-title mt-2 text-2xl font-semibold">{{ t('post.comments.title') }}</h2>
             </div>
-            <UiBadge variant="muted">{{ comments?.length ?? post.commentCount }} 条</UiBadge>
+            <UiBadge variant="muted">
+              {{ t('post.comments.count', { count: comments?.length ?? post.commentCount }) }}
+            </UiBadge>
           </div>
 
           <UiAlert
@@ -309,23 +314,23 @@ async function handleVisitorProfileSaved() {
           >
             <UiAlertDescription class="flex items-start gap-2">
               <ExclamationTriangleIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
-              <span>{{ commentError || likeError || '评论加载失败，请稍后重试。' }}</span>
+              <span>{{ commentError || likeError || t('post.comments.error') }}</span>
             </UiAlertDescription>
           </UiAlert>
 
           <form class="mt-6 space-y-3" @submit.prevent="submitComment">
-            <UiLabel for="comment">发表评论</UiLabel>
+            <UiLabel for="comment">{{ t('post.comments.write') }}</UiLabel>
             <UiTextarea
               id="comment"
               v-model="commentContent"
               class="min-h-[120px]"
               maxlength="1200"
-              placeholder="写下你的评论"
+              :placeholder="t('post.commentPlaceholder')"
               required
             />
             <UiButton :disabled="commentPending || !commentContent.trim()" type="submit">
               <PaperAirplaneIcon aria-hidden="true" class="size-4" />
-              {{ commentPending ? '发布中...' : '发布评论' }}
+              {{ commentPending ? t('post.commentSubmitting') : t('post.commentSubmit') }}
             </UiButton>
           </form>
 
@@ -333,7 +338,7 @@ async function handleVisitorProfileSaved() {
             v-if="!comments?.length"
             class="mt-8 border-t border-[var(--panel-border)] pt-6 text-sm text-[var(--muted)]"
           >
-            暂无评论。
+            {{ t('post.comments.empty') }}
           </div>
 
           <div v-else class="mt-8 divide-y divide-[var(--panel-border)]">
@@ -341,7 +346,7 @@ async function handleVisitorProfileSaved() {
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div class="meta-row">
                   <span>{{ comment.author.displayName }}</span>
-                  <span>{{ formatDateTime(comment.createdAt) }}</span>
+                  <span>{{ formatDateTime(comment.createdAt, locale) }}</span>
                 </div>
                 <UiButton
                   v-if="canDeleteComment(comment)"
@@ -352,7 +357,7 @@ async function handleVisitorProfileSaved() {
                   @click="removeComment(comment)"
                 >
                   <TrashIcon aria-hidden="true" class="size-4" />
-                  {{ deletingCommentId === comment.id ? '删除中...' : '删除' }}
+                  {{ deletingCommentId === comment.id ? t('common.deleting') : t('common.delete') }}
                 </UiButton>
               </div>
               <p class="text-body mt-3 whitespace-pre-wrap text-sm leading-7">

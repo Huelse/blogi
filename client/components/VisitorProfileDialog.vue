@@ -9,6 +9,7 @@ const emit = defineEmits<{
 }>()
 
 const visitor = useVisitorIdentity()
+const { t } = useI18n()
 const displayName = ref('')
 const email = ref('')
 const pending = ref(false)
@@ -41,7 +42,7 @@ async function submitProfile() {
     emit('saved', savedProfile)
     open.value = false
   } catch (error) {
-    errorMessage.value = getErrorMessage(error)
+    errorMessage.value = getErrorMessage(error, t('common.requestFailed'))
   } finally {
     pending.value = false
   }
@@ -67,13 +68,15 @@ function closeDialog() {
       >
         <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-subtle text-sm uppercase tracking-[0.24em]">Profile</p>
+            <p class="text-subtle text-sm uppercase tracking-[0.24em]">
+              {{ t('visitorProfile.eyebrow') }}
+            </p>
             <h2 id="visitor-profile-title" class="text-title mt-2 text-2xl font-semibold">
-              填写访客资料
+              {{ t('visitorProfile.title') }}
             </h2>
           </div>
           <UiButton
-            aria-label="关闭"
+            :aria-label="t('visitorProfile.close')"
             class="shrink-0"
             size="icon"
             type="button"
@@ -90,7 +93,7 @@ function closeDialog() {
 
         <form class="mt-6 space-y-4" @submit.prevent="submitProfile">
           <div class="space-y-2">
-            <UiLabel for="visitor-display-name">昵称</UiLabel>
+            <UiLabel for="visitor-display-name">{{ t('visitorProfile.displayName') }}</UiLabel>
             <UiInput
               id="visitor-display-name"
               v-model="displayName"
@@ -101,7 +104,7 @@ function closeDialog() {
           </div>
 
           <div class="space-y-2">
-            <UiLabel for="visitor-email">邮箱</UiLabel>
+            <UiLabel for="visitor-email">{{ t('visitorProfile.email') }}</UiLabel>
             <UiInput
               id="visitor-email"
               v-model="email"
@@ -113,9 +116,11 @@ function closeDialog() {
           </div>
 
           <div class="flex flex-wrap justify-end gap-3 pt-2">
-            <UiButton type="button" variant="secondary" @click="closeDialog">取消</UiButton>
+            <UiButton type="button" variant="secondary" @click="closeDialog">
+              {{ t('visitorProfile.cancel') }}
+            </UiButton>
             <UiButton :disabled="pending || !displayName.trim() || !email.trim()" type="submit">
-              {{ pending ? '保存中...' : '保存并继续' }}
+              {{ pending ? t('visitorProfile.pending') : t('visitorProfile.submit') }}
             </UiButton>
           </div>
         </form>

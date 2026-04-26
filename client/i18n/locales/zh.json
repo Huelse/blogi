@@ -1,0 +1,180 @@
+{
+  "common": {
+    "backToList": "返回列表",
+    "cancel": "取消",
+    "delete": "删除",
+    "deleting": "删除中...",
+    "edit": "编辑",
+    "language": {
+      "en": "English",
+      "zh": "简体中文"
+    },
+    "preview": "预览",
+    "requestFailed": "请求失败，请稍后重试",
+    "save": "保存",
+    "saving": "保存中...",
+    "view": "查看"
+  },
+  "app": {
+    "admin": "后台管理",
+    "home": "首页",
+    "languageSwitch": "切换到 {locale}",
+    "logout": "退出",
+    "theme": {
+      "dark": "深色",
+      "light": "浅色",
+      "switchToDark": "切换到黑暗主题",
+      "switchToLight": "切换到明亮主题"
+    }
+  },
+  "auth": {
+    "login": {
+      "cta": "没有账号，去注册",
+      "description": "使用用户名和密码进入后台管理，后续写作请求会自动附带认证头。",
+      "eyebrow": "登录",
+      "password": "密码",
+      "pending": "登录中...",
+      "submit": "登录",
+      "title": "登录 Blogi",
+      "username": "用户名"
+    },
+    "register": {
+      "cta": "已有账号，去登录",
+      "description": "注册成功后会直接写入本地会话，并进入后台管理。",
+      "displayName": "昵称",
+      "eyebrow": "注册",
+      "password": "密码",
+      "pending": "注册中...",
+      "submit": "注册并登录",
+      "title": "创建作者账号",
+      "username": "用户名"
+    }
+  },
+  "home": {
+    "allPosts": "全部文章",
+    "categories": "分类",
+    "empty": "还没有文章。",
+    "loadError": "文章列表加载失败，请确认后端已启动。",
+    "loading": "文章列表加载中...",
+    "readMore": "阅读全文",
+    "tags": "标签"
+  },
+  "post": {
+    "backToList": "返回列表",
+    "commentPlaceholder": "写下你的评论",
+    "commentSubmit": "发布评论",
+    "commentSubmitting": "发布中...",
+    "comments": {
+      "count": "{count} 条",
+      "eyebrow": "评论",
+      "empty": "暂无评论。",
+      "error": "评论加载失败，请稍后重试。",
+      "title": "评论",
+      "write": "发表评论"
+    },
+    "deleteCommentConfirm": "确定删除这条评论吗？",
+    "editInAdmin": "后台编辑",
+    "loadError": "文章不存在，或后端尚未启动。",
+    "like": "点赞",
+    "liked": "已点赞",
+    "liking": "处理中..."
+  },
+  "postEditor": {
+    "category": "分类",
+    "categoryPlaceholder": "例如：工程日志",
+    "content": "Markdown 正文",
+    "contentPlaceholder": "# 标题",
+    "previewFallback": "## 预览\n\n在这里输入 Markdown 正文。",
+    "summary": "摘要",
+    "summaryPlaceholder": "可选，不填时后端会从正文自动生成摘要",
+    "tags": "标签",
+    "tagsPlaceholder": "用逗号分隔，例如：Nuxt, Spring",
+    "title": "标题"
+  },
+  "visitorProfile": {
+    "cancel": "取消",
+    "close": "关闭",
+    "displayName": "昵称",
+    "email": "邮箱",
+    "eyebrow": "访客资料",
+    "pending": "保存中...",
+    "submit": "保存并继续",
+    "title": "填写访客资料"
+  },
+  "admin": {
+    "nav": {
+      "newPost": "写文章",
+      "overview": "概览",
+      "posts": "文章管理",
+      "settings": "博客设置"
+    },
+    "shell": {
+      "eyebrow": "管理设置",
+      "subtitle": "后台管理"
+    },
+    "overview": {
+      "description": "查看内容状态，并从这里进入常用管理操作。",
+      "latestEmpty": "暂无文章",
+      "latestLabel": "最近更新",
+      "latestPlaceholder": "创建文章后会显示更新时间",
+      "quickActions": "快捷操作",
+      "quickActionsDescription": "进入文章列表或打开编辑器。",
+      "title": "概览",
+      "totalPosts": "文章总数"
+    },
+    "posts": {
+      "confirmDelete": "确定删除《{title}》吗？",
+      "description": "管理已发布文章，进入编辑器更新内容，或创建新的文章。",
+      "emptyDescription": "可以从左侧菜单或右上角按钮开始写第一篇。",
+      "emptyTitle": "还没有文章。",
+      "listError": "文章列表加载失败，请确认后端已启动。",
+      "loading": "文章加载中...",
+      "myPosts": "我的文章",
+      "new": "新增文章",
+      "title": "文章管理",
+      "total": "共 {count} 篇文章"
+    },
+    "newPost": {
+      "description": "创建并发布文章，发布后文章会出现在前台公开列表中。",
+      "formDescription": "文章保存后会立即进入公开列表，分类和标签会自动创建并用于前台筛选。",
+      "formTitle": "新文章",
+      "submit": "发布文章",
+      "title": "写文章"
+    },
+    "editPost": {
+      "description": "更新标题、摘要、分类、标签和 Markdown 正文。保存后会刷新前台详情页展示。",
+      "formDescription": "只有作者本人可以更新内容。清空分类或标签后，文章会从对应筛选项中移除。",
+      "formTitle": "编辑文章",
+      "loadError": "无法加载待编辑文章。",
+      "submit": "保存修改",
+      "title": "编辑文章"
+    },
+    "settings": {
+      "description": "调整博客前台展示相关配置。",
+      "footer": {
+        "clear": "清空编辑内容",
+        "description": "自定义前台页脚 HTML，保存后会显示在首页和文章详情页底部。",
+        "empty": "页脚为空，前台页面不会显示页脚区域。",
+        "hint": "该内容会作为受信任 HTML 渲染，请只保存你自己编写或确认安全的模板；清空并保存后前台不会显示页脚。",
+        "label": "HTML 模板",
+        "loadError": "页脚设置加载失败，请确认后端已启动。",
+        "save": "保存页脚设置",
+        "saved": "已保存",
+        "title": "页脚设置"
+      },
+      "layout": {
+        "card": {
+          "description": "以网格卡片展示文章摘要，适合突出多篇内容的浏览入口。",
+          "label": "卡片模式"
+        },
+        "description": "选择前台文章列表的展示模式，设置会保存到当前浏览器。",
+        "list": {
+          "description": "当前文章列表的展示方式，按时间顺序纵向排列。",
+          "label": "列模式"
+        },
+        "title": "博客列表展示方式"
+      },
+      "title": "博客设置"
+    }
+  }
+}

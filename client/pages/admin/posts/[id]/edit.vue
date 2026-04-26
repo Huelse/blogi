@@ -3,14 +3,14 @@ import { ExclamationTriangleIcon } from '@heroicons/vue/20/solid'
 import type { PostDetail, PostPayload } from '~/types/blogi'
 import { getErrorMessage } from '~/utils/errors'
 
+definePageMeta({
+  middleware: 'auth',
+})
+
 const auth = useAuth()
 const route = useRoute()
-
-if (!auth.isAuthenticated.value) {
-  await navigateTo(`/login?redirect=${encodeURIComponent(route.fullPath)}`)
-}
-
 const api = useApiClient()
+const { t } = useI18n()
 const postId = computed(() => String(route.params.id))
 const pending = ref(false)
 const errorMessage = ref('')
@@ -18,9 +18,6 @@ const errorMessage = ref('')
 const { data: post, error } = await useAsyncData(
   () => `admin-edit-post-${postId.value}`,
   () => api<PostDetail>(`/posts/${postId.value}`),
-  {
-    immediate: auth.isAuthenticated.value,
-  },
 )
 
 if (post.value && post.value.author.id !== auth.user.value?.id) {
@@ -38,7 +35,7 @@ async function save(payload: PostPayload) {
     })
     await navigateTo(`/posts/${updated.id}`)
   } catch (saveError) {
-    errorMessage.value = getErrorMessage(saveError)
+    errorMessage.value = getErrorMessage(saveError, t('common.requestFailed'))
   } finally {
     pending.value = false
   }
@@ -46,14 +43,11 @@ async function save(payload: PostPayload) {
 </script>
 
 <template>
-  <AdminShell
-    title="编辑文章"
-    description="更新标题、摘要、分类、标签和 Markdown 正文。保存后会刷新前台详情页展示。"
-  >
+  <AdminShell :title="t('admin.editPost.title')" :description="t('admin.editPost.description')">
     <UiAlert v-if="error || !post" variant="destructive">
       <UiAlertDescription class="flex items-start gap-2">
         <ExclamationTriangleIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
-        <span>无法加载待编辑文章。</span>
+        <span>{{ t('admin.editPost.loadError') }}</span>
       </UiAlertDescription>
     </UiAlert>
     <template v-else>
@@ -65,13 +59,13 @@ async function save(payload: PostPayload) {
       </UiAlert>
 
       <PostEditorForm
-        back-label="返回文章管理"
+        :back-label="t('admin.nav.posts')"
         back-to="/admin/posts"
-        description="只有作者本人可以更新内容。清空分类或标签后，文章会从对应筛选项中移除。"
+        :description="t('admin.editPost.formDescription')"
         :initial-value="post"
         :submitting="pending"
-        submit-label="保存修改"
-        title="Edit Post"
+        :submit-label="t('admin.editPost.submit')"
+        :title="t('admin.editPost.formTitle')"
         @save="save"
       />
     </template>

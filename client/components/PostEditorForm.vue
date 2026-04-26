@@ -22,7 +22,7 @@ const props = withDefaults(
   {
     initialValue: () => ({}),
     backTo: '/',
-    backLabel: '返回列表',
+    backLabel: '',
     submitting: false,
   },
 )
@@ -30,6 +30,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   save: [payload: PostPayload]
 }>()
+const { t } = useI18n()
 
 const form = reactive<PostPayload>({
   title: '',
@@ -53,8 +54,9 @@ watch(
 )
 
 const previewHtml = computed(() =>
-  renderMarkdown(form.contentMarkdown || '## 预览\n\n在这里输入 Markdown 正文。'),
+  renderMarkdown(form.contentMarkdown || t('postEditor.previewFallback')),
 )
+const resolvedBackLabel = computed(() => props.backLabel || t('common.backToList'))
 
 function submit() {
   emit('save', {
@@ -110,52 +112,52 @@ function parseTags(value: string) {
     <form class="mt-8 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]" @submit.prevent="submit">
       <div class="space-y-5">
         <div>
-          <UiLabel for="title">标题</UiLabel>
+          <UiLabel for="title">{{ t('postEditor.title') }}</UiLabel>
           <UiInput id="title" v-model="form.title" maxlength="120" required type="text" />
         </div>
 
         <div>
-          <UiLabel for="summary">摘要</UiLabel>
+          <UiLabel for="summary">{{ t('postEditor.summary') }}</UiLabel>
           <UiTextarea
             id="summary"
             v-model="form.summary"
             class="min-h-[110px]"
             maxlength="280"
-            placeholder="可选，不填时后端会从正文自动生成摘要"
+            :placeholder="t('postEditor.summaryPlaceholder')"
           />
         </div>
 
         <div class="grid gap-5 md:grid-cols-2">
           <div>
-            <UiLabel for="category">分类</UiLabel>
+            <UiLabel for="category">{{ t('postEditor.category') }}</UiLabel>
             <UiInput
               id="category"
               v-model="form.category"
               maxlength="40"
-              placeholder="例如：工程日志"
+              :placeholder="t('postEditor.categoryPlaceholder')"
               type="text"
             />
           </div>
 
           <div>
-            <UiLabel for="tags">标签</UiLabel>
+            <UiLabel for="tags">{{ t('postEditor.tags') }}</UiLabel>
             <UiInput
               id="tags"
               v-model="tagText"
               maxlength="280"
-              placeholder="用逗号分隔，例如：Nuxt, Spring"
+              :placeholder="t('postEditor.tagsPlaceholder')"
               type="text"
             />
           </div>
         </div>
 
         <div>
-          <UiLabel for="content">Markdown 正文</UiLabel>
+          <UiLabel for="content">{{ t('postEditor.content') }}</UiLabel>
           <UiTextarea
             id="content"
             v-model="form.contentMarkdown"
             class="min-h-[380px] font-mono text-[13px] leading-7"
-            placeholder="# 标题"
+            :placeholder="t('postEditor.contentPlaceholder')"
             required
           />
         </div>
@@ -163,17 +165,17 @@ function parseTags(value: string) {
         <div class="flex flex-wrap gap-3">
           <UiButton :disabled="submitting" type="submit">
             <PencilSquareIcon aria-hidden="true" class="size-4" />
-            {{ submitting ? '提交中...' : submitLabel }}
+            {{ submitting ? t('common.saving') : submitLabel }}
           </UiButton>
           <NuxtLink :class="buttonVariants({ variant: 'secondary' })" :to="backTo">
             <ArrowLeftIcon aria-hidden="true" class="size-4" />
-            {{ backLabel }}
+            {{ resolvedBackLabel }}
           </NuxtLink>
         </div>
       </div>
 
       <div class="rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-soft-bg)] p-6">
-        <p class="text-subtle text-sm uppercase tracking-[0.24em]">Preview</p>
+        <p class="text-subtle text-sm uppercase tracking-[0.24em]">{{ t('common.preview') }}</p>
         <!-- eslint-disable-next-line vue/no-v-html -->
         <article class="prose-blog mt-6" v-html="previewHtml" />
       </div>

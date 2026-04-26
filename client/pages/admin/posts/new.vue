@@ -3,14 +3,12 @@ import { ExclamationTriangleIcon } from '@heroicons/vue/20/solid'
 import type { PostDetail, PostPayload } from '~/types/blogi'
 import { getErrorMessage } from '~/utils/errors'
 
-const route = useRoute()
-const auth = useAuth()
-
-if (!auth.isAuthenticated.value) {
-  await navigateTo(`/login?redirect=${encodeURIComponent(route.fullPath)}`)
-}
+definePageMeta({
+  middleware: 'auth',
+})
 
 const api = useApiClient()
+const { t } = useI18n()
 const pending = ref(false)
 const errorMessage = ref('')
 
@@ -25,7 +23,7 @@ async function save(payload: PostPayload) {
     })
     await navigateTo(`/posts/${post.id}`)
   } catch (error) {
-    errorMessage.value = getErrorMessage(error)
+    errorMessage.value = getErrorMessage(error, t('common.requestFailed'))
   } finally {
     pending.value = false
   }
@@ -33,7 +31,7 @@ async function save(payload: PostPayload) {
 </script>
 
 <template>
-  <AdminShell title="写文章" description="创建并发布文章，发布后文章会出现在前台公开列表中。">
+  <AdminShell :title="t('admin.newPost.title')" :description="t('admin.newPost.description')">
     <UiAlert v-if="errorMessage" class="mb-6" variant="destructive">
       <UiAlertDescription class="flex items-start gap-2">
         <ExclamationTriangleIcon aria-hidden="true" class="mt-0.5 size-4 shrink-0" />
@@ -42,12 +40,12 @@ async function save(payload: PostPayload) {
     </UiAlert>
 
     <PostEditorForm
-      back-label="返回文章管理"
+      :back-label="t('admin.nav.posts')"
       back-to="/admin/posts"
-      description="文章保存后会立即进入公开列表，分类和标签会自动创建并用于前台筛选。"
+      :description="t('admin.newPost.formDescription')"
       :submitting="pending"
-      submit-label="发布文章"
-      title="New Post"
+      :submit-label="t('admin.newPost.submit')"
+      :title="t('admin.newPost.formTitle')"
       @save="save"
     />
   </AdminShell>

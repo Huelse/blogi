@@ -1,0 +1,180 @@
+{
+  "common": {
+    "backToList": "Back to list",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "edit": "Edit",
+    "language": {
+      "en": "English",
+      "zh": "Simplified Chinese"
+    },
+    "preview": "Preview",
+    "requestFailed": "Request failed. Please try again later.",
+    "save": "Save",
+    "saving": "Saving...",
+    "view": "View"
+  },
+  "app": {
+    "admin": "Admin",
+    "home": "Home",
+    "languageSwitch": "Switch language to {locale}",
+    "logout": "Log out",
+    "theme": {
+      "dark": "Dark",
+      "light": "Light",
+      "switchToDark": "Switch to dark theme",
+      "switchToLight": "Switch to light theme"
+    }
+  },
+  "auth": {
+    "login": {
+      "cta": "Need an account? Register",
+      "description": "Sign in with your username and password. Future writing requests will include the auth header automatically.",
+      "eyebrow": "Login",
+      "password": "Password",
+      "pending": "Signing in...",
+      "submit": "Sign in",
+      "title": "Sign in to Blogi",
+      "username": "Username"
+    },
+    "register": {
+      "cta": "Already have an account? Sign in",
+      "description": "A successful registration creates the local session immediately and sends you to the admin area.",
+      "displayName": "Display name",
+      "eyebrow": "Register",
+      "password": "Password",
+      "pending": "Creating account...",
+      "submit": "Create account",
+      "title": "Create an author account",
+      "username": "Username"
+    }
+  },
+  "home": {
+    "allPosts": "All posts",
+    "categories": "Categories",
+    "empty": "No posts yet.",
+    "loadError": "Failed to load posts. Make sure the backend is running.",
+    "loading": "Loading posts...",
+    "readMore": "Read more",
+    "tags": "Tags"
+  },
+  "post": {
+    "backToList": "Back to list",
+    "commentPlaceholder": "Write your comment",
+    "commentSubmit": "Post comment",
+    "commentSubmitting": "Posting...",
+    "comments": {
+      "count": "{count} comments",
+      "eyebrow": "Comments",
+      "empty": "No comments yet.",
+      "error": "Failed to load comments. Please try again later.",
+      "title": "Comments",
+      "write": "Write a comment"
+    },
+    "deleteCommentConfirm": "Delete this comment?",
+    "editInAdmin": "Edit in admin",
+    "loadError": "The post does not exist, or the backend is unavailable.",
+    "like": "Like",
+    "liked": "Liked",
+    "liking": "Working..."
+  },
+  "postEditor": {
+    "category": "Category",
+    "categoryPlaceholder": "For example: Engineering Log",
+    "content": "Markdown content",
+    "contentPlaceholder": "# Title",
+    "previewFallback": "## Preview\n\nWrite your Markdown content here.",
+    "summary": "Summary",
+    "summaryPlaceholder": "Optional. If empty, the backend will generate one from the content.",
+    "tags": "Tags",
+    "tagsPlaceholder": "Separate with commas, for example: Nuxt, Spring",
+    "title": "Title"
+  },
+  "visitorProfile": {
+    "cancel": "Cancel",
+    "close": "Close",
+    "displayName": "Display name",
+    "email": "Email",
+    "eyebrow": "Profile",
+    "pending": "Saving...",
+    "submit": "Save and continue",
+    "title": "Complete your visitor profile"
+  },
+  "admin": {
+    "nav": {
+      "newPost": "Write post",
+      "overview": "Overview",
+      "posts": "Posts",
+      "settings": "Blog settings"
+    },
+    "shell": {
+      "eyebrow": "Manage",
+      "subtitle": "Admin dashboard"
+    },
+    "overview": {
+      "description": "Review content status and jump into the most common management actions from here.",
+      "latestEmpty": "No posts yet",
+      "latestLabel": "Latest update",
+      "latestPlaceholder": "The most recent update will appear here after you create a post.",
+      "quickActions": "Quick actions",
+      "quickActionsDescription": "Open the post list or jump straight into the editor.",
+      "title": "Overview",
+      "totalPosts": "Total posts"
+    },
+    "posts": {
+      "confirmDelete": "Delete \"{title}\"?",
+      "description": "Manage published posts, update existing content, or create a new post.",
+      "emptyDescription": "Use the left navigation or the button above to write your first post.",
+      "emptyTitle": "No posts yet.",
+      "listError": "Failed to load posts. Make sure the backend is running.",
+      "loading": "Loading posts...",
+      "myPosts": "My posts",
+      "new": "New post",
+      "title": "Post management",
+      "total": "{count} posts"
+    },
+    "newPost": {
+      "description": "Create and publish a post. Published posts appear immediately in the public list.",
+      "formDescription": "After saving, the post becomes public immediately. Categories and tags are created automatically for filtering.",
+      "formTitle": "New post",
+      "submit": "Publish post",
+      "title": "Write post"
+    },
+    "editPost": {
+      "description": "Update the title, summary, category, tags, and Markdown content. Saving refreshes the public post page.",
+      "formDescription": "Only the author can update this content. Clearing the category or tags removes the post from those filters.",
+      "formTitle": "Edit post",
+      "loadError": "Failed to load the post for editing.",
+      "submit": "Save changes",
+      "title": "Edit post"
+    },
+    "settings": {
+      "description": "Adjust how the blog is presented on the public site.",
+      "footer": {
+        "clear": "Clear editor",
+        "description": "Customize the public footer HTML. After saving, it appears on the home page and post detail pages.",
+        "empty": "The footer is empty, so the public pages will not render a footer section.",
+        "hint": "This content is rendered as trusted HTML. Only save markup that you wrote yourself or have verified as safe. If you clear and save it, the public site stops showing the footer.",
+        "label": "HTML template",
+        "loadError": "Failed to load footer settings. Make sure the backend is running.",
+        "save": "Save footer settings",
+        "saved": "Saved",
+        "title": "Footer settings"
+      },
+      "layout": {
+        "card": {
+          "description": "Show post summaries in a card grid, which works well when you want multiple entries to compete for attention.",
+          "label": "Card layout"
+        },
+        "description": "Choose how the public post list is displayed. The setting is stored in the current browser.",
+        "list": {
+          "description": "Display the current post list as a vertical time-ordered list.",
+          "label": "List layout"
+        },
+        "title": "Post list layout"
+      },
+      "title": "Blog settings"
+    }
+  }
+}
