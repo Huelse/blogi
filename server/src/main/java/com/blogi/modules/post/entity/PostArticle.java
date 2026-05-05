@@ -18,6 +18,7 @@ public class PostArticle {
     private String title;
     private String summary;
     private String coverUrl;
+    private Long viewCount;
     private String contentMarkdown;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -76,6 +77,14 @@ public class PostArticle {
 
     public void setCoverUrl(String coverUrl) {
         this.coverUrl = coverUrl;
+    }
+
+    public Long getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(Long viewCount) {
+        this.viewCount = viewCount;
     }
 
     public LocalDateTime getCreatedAt() {

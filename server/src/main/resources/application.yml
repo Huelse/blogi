@@ -33,6 +33,12 @@ blogi:
   security:
     jwt-secret: ${JWT_SECRET:change-me-to-a-long-random-string}
     jwt-expiration-seconds: ${JWT_EXPIRATION:86400}
+  ai:
+    enabled: ${AI_ENABLED:false}
+    base-url: ${AI_BASE_URL:https://api.openai.com/v1}
+    api-key: ${AI_API_KEY:}
+    model: ${AI_MODEL:gpt-4o-mini}
+    summary-max-chars: ${AI_SUMMARY_MAX_CHARS:220}
   upload:
     storage: ${UPLOAD_STORAGE:LOCAL}
     max-size-bytes: ${UPLOAD_MAX_SIZE_BYTES:5242880}

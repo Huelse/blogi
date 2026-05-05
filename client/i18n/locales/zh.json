@@ -80,6 +80,12 @@
     "liking": "处理中..."
   },
   "postEditor": {
+    "aiSummary": "AI 生成摘要",
+    "aiSummaryApplied": "已生成摘要。",
+    "aiSummaryFallbackNotice": "AI 暂不可用，已使用正文截断结果。",
+    "aiSummaryFailed": "AI 摘要生成失败，请稍后重试",
+    "aiSummaryGenerating": "生成中...",
+    "aiSummaryRequiresContent": "请先填写正文后再生成摘要",
     "category": "分类",
     "categoryPlaceholder": "例如：工程日志",
     "coverPreview": "封面预览",

@@ -14,6 +14,7 @@ public record PostSummaryResponse(
     PostCategoryResponse category,
     List<PostTagResponse> tags,
     long commentCount,
+    long viewCount,
     long likeCount
 ) {
 }

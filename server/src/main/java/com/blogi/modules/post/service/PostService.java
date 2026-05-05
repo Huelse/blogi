@@ -11,9 +11,13 @@ import com.blogi.modules.post.dto.PostCommentResponse;
 import com.blogi.modules.post.dto.PostDetailResponse;
 import com.blogi.modules.post.dto.PostLikeRequest;
 import com.blogi.modules.post.dto.PostLikeStateResponse;
+import com.blogi.modules.post.dto.PostSummaryGenerateRequest;
+import com.blogi.modules.post.dto.PostSummaryGenerateResponse;
 import com.blogi.modules.post.dto.PostSummaryResponse;
 import com.blogi.modules.post.dto.PostTagResponse;
 import com.blogi.modules.post.dto.PostUpsertRequest;
+import com.blogi.modules.post.dto.PostViewRequest;
+import com.blogi.modules.post.dto.PostViewStateResponse;
 import com.blogi.modules.post.entity.PostArticle;
 import com.blogi.modules.post.entity.PostCategory;
 import com.blogi.modules.post.entity.PostComment;
@@ -56,6 +60,8 @@ public class PostService {
     private final PostLikeMapper postLikeMapper;
     private final VisitorIdentityMapper visitorIdentityMapper;
     private final VisitorService visitorService;
+    private final PostStatsService postStatsService;
+    private final PostAiSummaryService postAiSummaryService;
 
     public PostService(
         PostArticleMapper postArticleMapper,
@@ -66,7 +72,9 @@ public class PostService {
         PostCommentMapper postCommentMapper,
         PostLikeMapper postLikeMapper,
         VisitorIdentityMapper visitorIdentityMapper,
-        VisitorService visitorService
+        VisitorService visitorService,
+        PostStatsService postStatsService,
+        PostAiSummaryService postAiSummaryService
     ) {
         this.postArticleMapper = postArticleMapper;
         this.userAccountMapper = userAccountMapper;
@@ -77,6 +85,8 @@ public class PostService {
         this.postLikeMapper = postLikeMapper;
         this.visitorIdentityMapper = visitorIdentityMapper;
         this.visitorService = visitorService;
+        this.postStatsService = postStatsService;
+        this.postAiSummaryService = postAiSummaryService;
     }
 
     public List<PostSummaryResponse> listPosts(String categorySlug, String tagSlug) {
@@ -139,6 +149,19 @@ public class PostService {
         return toDetailResponse(getRequiredPost(postId));
     }
 
+    public PostSummaryGenerateResponse generateSummary(PostSummaryGenerateRequest request) {
+        var markdown = request.contentMarkdown().trim();
+        var aiSummary = postAiSummaryService.generateSummary(request.title(), markdown);
+        var summary = aiSummary.orElseGet(() -> normalizeSummary("", markdown));
+        return new PostSummaryGenerateResponse(summary, aiSummary.isPresent());
+    }
+
+    public PostViewStateResponse trackPostView(Long postId, PostViewRequest request) {
+        var post = getRequiredPost(postId);
+        var persistedCount = post.getViewCount() == null ? 0L : post.getViewCount();
+        return postStatsService.trackView(postId, persistedCount, request.fingerprintHash());
+    }
+
     public PostDetailResponse createPost(Long authorId, PostUpsertRequest request) {
         var now = LocalDateTime.now();
         var category = findOrCreateCategory(request.category());
@@ -149,6 +172,7 @@ public class PostService {
         post.setTitle(request.title().trim());
         post.setSummary(normalizeSummary(request.summary(), request.contentMarkdown()));
         post.setCoverUrl(normalizeOptionalAssetUrl(request.coverUrl(), "封面地址格式不正确"));
+        post.setViewCount(0L);
         post.setContentMarkdown(request.contentMarkdown().trim());
         post.setCreatedAt(now);
         post.setUpdatedAt(now);
@@ -215,6 +239,7 @@ public class PostService {
             like.setCreatedAt(LocalDateTime.now());
             postLikeMapper.insert(like);
         }
+        postStatsService.evictLikeCount(postId);
         return toLikeState(postId, visitor);
     }
 
@@ -224,6 +249,7 @@ public class PostService {
         postLikeMapper.delete(new LambdaQueryWrapper<PostLike>()
             .eq(PostLike::getPostId, postId)
             .eq(PostLike::getVisitorId, visitor.getId()));
+        postStatsService.evictLikeCount(postId);
         return toLikeState(postId, visitor);
     }
 
@@ -268,6 +294,7 @@ public class PostService {
         var categoriesById = getCategoriesById(posts);
         var tagsByPostId = getTagsByPostIds(posts);
         var commentCountsByPostId = getCommentCountsByPostIds(posts);
+        var viewCountsByPostId = getViewCountsByPostIds(posts);
         var likeCountsByPostId = getLikeCountsByPostIds(posts);
         return posts.stream()
             .map(post -> new PostSummaryResponse(
@@ -281,6 +308,7 @@ public class PostService {
                 toCategory(categoriesById.get(post.getCategoryId())),
                 tagsByPostId.getOrDefault(post.getId(), List.of()),
                 commentCountsByPostId.getOrDefault(post.getId(), 0L),
+                viewCountsByPostId.getOrDefault(post.getId(), 0L),
                 likeCountsByPostId.getOrDefault(post.getId(), 0L)
             ))
             .toList();
@@ -302,6 +330,7 @@ public class PostService {
             getTagsByPostId(post.getId()),
             postCommentMapper.selectCount(new LambdaQueryWrapper<PostComment>()
                 .eq(PostComment::getPostId, post.getId())),
+            getViewCount(post),
             getLikeCount(post.getId())
         );
     }
@@ -464,11 +493,16 @@ public class PostService {
             return Collections.emptyMap();
         }
 
-        return postLikeMapper.selectList(new LambdaQueryWrapper<PostLike>()
+        var persistedLikeCounts = postLikeMapper.selectList(new LambdaQueryWrapper<PostLike>()
                 .select(PostLike::getPostId)
                 .in(PostLike::getPostId, postIds))
             .stream()
             .collect(Collectors.groupingBy(PostLike::getPostId, Collectors.counting()));
+        return postStatsService.resolveLikeCounts(postIds, persistedLikeCounts);
+    }
+
+    private Map<Long, Long> getViewCountsByPostIds(List<PostArticle> posts) {
+        return postStatsService.resolveViewCounts(posts);
     }
 
     private PostLikeStateResponse toLikeState(Long postId, VisitorIdentity visitor) {
@@ -479,8 +513,14 @@ public class PostService {
     }
 
     private long getLikeCount(Long postId) {
-        return postLikeMapper.selectCount(new LambdaQueryWrapper<PostLike>()
+        var persistedCount = postLikeMapper.selectCount(new LambdaQueryWrapper<PostLike>()
             .eq(PostLike::getPostId, postId));
+        return postStatsService.resolveLikeCount(postId, persistedCount);
+    }
+
+    private long getViewCount(PostArticle post) {
+        var persistedCount = post.getViewCount() == null ? 0L : post.getViewCount();
+        return postStatsService.resolveViewCount(post.getId(), persistedCount);
     }
 
     private boolean hasLike(Long postId, Long visitorId) {

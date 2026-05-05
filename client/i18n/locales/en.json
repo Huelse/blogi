@@ -80,6 +80,12 @@
     "liking": "Working..."
   },
   "postEditor": {
+    "aiSummary": "Generate summary",
+    "aiSummaryApplied": "Summary generated.",
+    "aiSummaryFallbackNotice": "AI is unavailable. Fallback summary from content was applied.",
+    "aiSummaryFailed": "Failed to generate summary with AI. Please try again.",
+    "aiSummaryGenerating": "Generating...",
+    "aiSummaryRequiresContent": "Write content before generating a summary.",
     "category": "Category",
     "categoryPlaceholder": "For example: Engineering Log",
     "coverPreview": "Cover preview",

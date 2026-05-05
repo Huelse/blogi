@@ -46,6 +46,7 @@ export interface PostSummary {
   category: PostCategory | null
   tags: PostTag[]
   commentCount: number
+  viewCount: number
   likeCount: number
 }
 
@@ -111,6 +112,25 @@ export interface PostLikePayload {
 export interface PostLikeState {
   likeCount: number
   liked: boolean
+}
+
+export interface PostViewPayload {
+  fingerprintHash: string
+}
+
+export interface PostViewState {
+  viewCount: number
+  counted: boolean
+}
+
+export interface PostAiSummaryPayload {
+  title: string
+  contentMarkdown: string
+}
+
+export interface PostAiSummaryResponse {
+  summary: string
+  generatedByAi: boolean
 }
 
 export type UploadUsage = 'POST_COVER' | 'USER_AVATAR' | 'VISITOR_AVATAR'

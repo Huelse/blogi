@@ -3,6 +3,7 @@ import {
   ArrowLeftIcon,
   ChatBubbleLeftEllipsisIcon,
   ExclamationTriangleIcon,
+  EyeIcon,
   FolderIcon,
   HeartIcon,
   PaperAirplaneIcon,
@@ -17,6 +18,8 @@ import type {
   PostDetail,
   PostLikePayload,
   PostLikeState,
+  PostViewPayload,
+  PostViewState,
 } from '~/types/blogi'
 import { formatDateTime } from '~/utils/date'
 import { getErrorMessage } from '~/utils/errors'
@@ -55,15 +58,11 @@ const {
 const html = computed(() => renderMarkdown(post.value?.contentMarkdown ?? ''))
 const isOwner = computed(() => post.value?.author.id === auth.user.value?.id)
 const likeCount = computed(() => likeState.value?.likeCount ?? post.value?.likeCount ?? 0)
+const viewCount = computed(() => post.value?.viewCount ?? 0)
 const liked = computed(() => likeState.value?.liked ?? false)
 
 onMounted(async () => {
-  try {
-    await visitor.loadProfile()
-    await refreshLikeState()
-  } catch {
-    // Interaction errors are surfaced when the user actively comments or likes.
-  }
+  await Promise.allSettled([visitor.loadProfile(), refreshLikeState(), trackView()])
 })
 
 async function submitComment() {
@@ -171,6 +170,19 @@ async function refreshLikeState() {
   applyLikeState(state)
 }
 
+async function trackView() {
+  if (!post.value || !import.meta.client) {
+    return
+  }
+
+  const fingerprintHash = await visitor.ensureFingerprintHash()
+  const state = await api<PostViewState>(`/posts/${postId.value}/views`, {
+    method: 'POST',
+    body: { fingerprintHash } satisfies PostViewPayload,
+  })
+  post.value.viewCount = state.viewCount
+}
+
 function applyLikeState(state: PostLikeState) {
   likeState.value = state
   if (post.value) {
@@ -235,6 +247,10 @@ async function handleVisitorProfileSaved() {
             <span class="inline-flex items-center gap-1.5">
               <HeartIcon aria-hidden="true" class="size-4" />
               {{ likeCount }}
+            </span>
+            <span class="inline-flex items-center gap-1.5">
+              <EyeIcon aria-hidden="true" class="size-4" />
+              {{ viewCount }}
             </span>
           </div>
           <h1 class="text-title mt-5 text-4xl font-semibold tracking-tight md:text-5xl">

@@ -2,6 +2,7 @@
 import {
   BookOpenIcon,
   ChatBubbleLeftEllipsisIcon,
+  EyeIcon,
   ExclamationTriangleIcon,
   FolderIcon,
   HeartIcon,
@@ -191,6 +192,10 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
                   <HeartIcon aria-hidden="true" class="size-4" />
                   {{ post.likeCount }}
                 </span>
+                <span class="inline-flex items-center gap-1.5">
+                  <EyeIcon aria-hidden="true" class="size-4" />
+                  {{ post.viewCount }}
+                </span>
               </div>
               <span
                 :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
@@ -229,6 +234,10 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
                 <span class="inline-flex items-center gap-1.5">
                   <HeartIcon aria-hidden="true" class="size-4" />
                   {{ post.likeCount }}
+                </span>
+                <span class="inline-flex items-center gap-1.5">
+                  <EyeIcon aria-hidden="true" class="size-4" />
+                  {{ post.viewCount }}
                 </span>
               </div>
               <h2 class="text-title mt-4 text-2xl font-semibold tracking-tight md:text-3xl">

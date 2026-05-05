@@ -62,6 +62,7 @@ public class SecurityConfig {
                 auth.requestMatchers(HttpMethod.POST, "/api/posts/*/comments").permitAll();
                 auth.requestMatchers(HttpMethod.POST, "/api/posts/*/likes").permitAll();
                 auth.requestMatchers(HttpMethod.DELETE, "/api/posts/*/likes").permitAll();
+                auth.requestMatchers(HttpMethod.POST, "/api/posts/*/views").permitAll();
                 auth.anyRequest().authenticated();
             })
             .exceptionHandling(ex -> ex

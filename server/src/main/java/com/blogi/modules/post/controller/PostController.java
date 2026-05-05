@@ -8,9 +8,13 @@ import com.blogi.modules.post.dto.PostCommentResponse;
 import com.blogi.modules.post.dto.PostDetailResponse;
 import com.blogi.modules.post.dto.PostLikeRequest;
 import com.blogi.modules.post.dto.PostLikeStateResponse;
+import com.blogi.modules.post.dto.PostSummaryGenerateRequest;
+import com.blogi.modules.post.dto.PostSummaryGenerateResponse;
 import com.blogi.modules.post.dto.PostSummaryResponse;
 import com.blogi.modules.post.dto.PostTagResponse;
 import com.blogi.modules.post.dto.PostUpsertRequest;
+import com.blogi.modules.post.dto.PostViewRequest;
+import com.blogi.modules.post.dto.PostViewStateResponse;
 import com.blogi.modules.post.service.PostService;
 import com.blogi.security.UserPrincipal;
 import jakarta.validation.Valid;
@@ -62,6 +66,14 @@ public class PostController {
     @GetMapping("/{postId}")
     public ApiResponse<PostDetailResponse> getPost(@PathVariable Long postId) {
         return ApiResponse.ok(postService.getPost(postId));
+    }
+
+    @PostMapping("/{postId}/views")
+    public ApiResponse<PostViewStateResponse> trackView(
+        @PathVariable Long postId,
+        @Valid @RequestBody PostViewRequest request
+    ) {
+        return ApiResponse.ok(postService.trackPostView(postId, request));
     }
 
     @GetMapping("/{postId}/comments")
@@ -117,6 +129,15 @@ public class PostController {
         @Valid @RequestBody PostUpsertRequest request
     ) {
         return ApiResponse.ok(postService.createPost(requireUserId(principal), request));
+    }
+
+    @PostMapping("/summary/generate")
+    public ApiResponse<PostSummaryGenerateResponse> generateSummary(
+        @AuthenticationPrincipal UserPrincipal principal,
+        @Valid @RequestBody PostSummaryGenerateRequest request
+    ) {
+        requireUserId(principal);
+        return ApiResponse.ok(postService.generateSummary(request));
     }
 
     @PutMapping("/{postId}")

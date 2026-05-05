@@ -203,9 +203,44 @@ class BlogiApiIntegrationTests {
             .andExpect(jsonPath("$.data", hasSize(1)))
             .andExpect(jsonPath("$.data[0].title", is("Taxonomy Post")))
             .andExpect(jsonPath("$.data[0].commentCount", is(0)))
+            .andExpect(jsonPath("$.data[0].viewCount", is(0)))
             .andExpect(jsonPath("$.data[0].likeCount", is(0)));
 
         var visitorFingerprint = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        var anotherFingerprint = "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
+
+        mockMvc.perform(post("/api/posts/" + postId + "/views")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "fingerprintHash": "%s"
+                    }
+                    """.formatted(visitorFingerprint)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.counted", is(true)))
+            .andExpect(jsonPath("$.data.viewCount", is(1)));
+
+        mockMvc.perform(post("/api/posts/" + postId + "/views")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "fingerprintHash": "%s"
+                    }
+                    """.formatted(visitorFingerprint)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.counted", is(false)))
+            .andExpect(jsonPath("$.data.viewCount", is(1)));
+
+        mockMvc.perform(post("/api/posts/" + postId + "/views")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "fingerprintHash": "%s"
+                    }
+                    """.formatted(anotherFingerprint)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.counted", is(true)))
+            .andExpect(jsonPath("$.data.viewCount", is(2)));
 
         mockMvc.perform(post("/api/posts/" + postId + "/comments")
                 .contentType(APPLICATION_JSON)
@@ -256,6 +291,7 @@ class BlogiApiIntegrationTests {
         mockMvc.perform(get("/api/posts/" + postId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data.commentCount", is(1)))
+            .andExpect(jsonPath("$.data.viewCount", is(2)))
             .andExpect(jsonPath("$.data.likeCount", is(0)));
 
         mockMvc.perform(get("/api/posts/" + postId + "/likes")
@@ -371,6 +407,48 @@ class BlogiApiIntegrationTests {
         mockMvc.perform(get("/api/settings"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data.footerHtml", is("<p>Public footer</p>")));
+    }
+
+    @Test
+    void authenticatedUserCanGenerateSummaryWithFallbackWhenAiDisabled() throws Exception {
+        mockMvc.perform(post("/api/posts/summary/generate")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "title": "No Auth",
+                      "contentMarkdown": "## Heading\\n\\nBody"
+                    }
+                    """))
+            .andExpect(status().isUnauthorized());
+
+        var registerResponse = mockMvc.perform(post("/api/auth/register")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "username": "summaryuser",
+                      "displayName": "Summary User",
+                      "password": "password123"
+                    }
+                    """))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        var token = JsonTestUtils.read(registerResponse, "$.data.token");
+
+        mockMvc.perform(post("/api/posts/summary/generate")
+                .header("Authorization", "Bearer " + token)
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "title": "AI Draft",
+                      "contentMarkdown": "## Heading\\n\\nSummary fallback body."
+                    }
+                    """))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.generatedByAi", is(false)))
+            .andExpect(jsonPath("$.data.summary", is("Heading Summary fallback body.")));
     }
 
     @Test

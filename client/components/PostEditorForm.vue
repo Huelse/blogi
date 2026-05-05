@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { ArrowLeftIcon, PencilSquareIcon } from '@heroicons/vue/20/solid'
+import { ArrowLeftIcon, PencilSquareIcon, SparklesIcon } from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
-import type { PostCategory, PostPayload, PostTag, UploadResponse } from '~/types/blogi'
+import type {
+  PostAiSummaryResponse,
+  PostCategory,
+  PostPayload,
+  PostTag,
+  UploadResponse,
+} from '~/types/blogi'
 import { getErrorMessage } from '~/utils/errors'
 import { renderMarkdown } from '~/utils/markdown'
 
@@ -45,6 +51,9 @@ const form = reactive<PostPayload>({
 const tagText = ref('')
 const coverUploading = ref(false)
 const coverUploadError = ref('')
+const aiSummaryPending = ref(false)
+const aiSummaryError = ref('')
+const aiSummaryHint = ref('')
 
 watch(
   () => props.initialValue,
@@ -102,6 +111,39 @@ async function uploadCover(event: Event) {
   }
 }
 
+async function generateAiSummary() {
+  if (aiSummaryPending.value || submitting.value) {
+    return
+  }
+
+  aiSummaryError.value = ''
+  aiSummaryHint.value = ''
+  const contentMarkdown = form.contentMarkdown.trim()
+  if (!contentMarkdown) {
+    aiSummaryError.value = t('postEditor.aiSummaryRequiresContent')
+    return
+  }
+
+  aiSummaryPending.value = true
+  try {
+    const response = await api<PostAiSummaryResponse>('/posts/summary/generate', {
+      method: 'POST',
+      body: {
+        title: form.title.trim(),
+        contentMarkdown,
+      },
+    })
+    form.summary = response.summary
+    aiSummaryHint.value = response.generatedByAi
+      ? t('postEditor.aiSummaryApplied')
+      : t('postEditor.aiSummaryFallbackNotice')
+  } catch (error) {
+    aiSummaryError.value = getErrorMessage(error, t('postEditor.aiSummaryFailed'))
+  } finally {
+    aiSummaryPending.value = false
+  }
+}
+
 function normalizeInitialCategory(category: PostEditorInitialValue['category']) {
   if (!category) {
     return ''
@@ -132,6 +174,8 @@ function parseTags(value: string) {
 
   return [...tagsByKey.values()]
 }
+
+const submitting = computed(() => props.submitting)
 </script>
 
 <template>
@@ -151,7 +195,19 @@ function parseTags(value: string) {
         </div>
 
         <div>
-          <UiLabel for="summary">{{ t('postEditor.summary') }}</UiLabel>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <UiLabel for="summary">{{ t('postEditor.summary') }}</UiLabel>
+            <UiButton
+              :disabled="submitting || aiSummaryPending"
+              size="sm"
+              type="button"
+              variant="secondary"
+              @click="generateAiSummary"
+            >
+              <SparklesIcon aria-hidden="true" class="size-4" />
+              {{ aiSummaryPending ? t('postEditor.aiSummaryGenerating') : t('postEditor.aiSummary') }}
+            </UiButton>
+          </div>
           <UiTextarea
             id="summary"
             v-model="form.summary"
@@ -159,6 +215,8 @@ function parseTags(value: string) {
             maxlength="280"
             :placeholder="t('postEditor.summaryPlaceholder')"
           />
+          <p v-if="aiSummaryHint" class="text-muted mt-2 text-xs">{{ aiSummaryHint }}</p>
+          <p v-if="aiSummaryError" class="mt-2 text-xs text-red-500">{{ aiSummaryError }}</p>
         </div>
 
         <div class="space-y-2">
