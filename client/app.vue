@@ -87,7 +87,7 @@ async function toggleLocale() {
                 :alt="auth.user.value.displayName"
                 class="size-4 rounded-full object-cover"
                 :src="auth.user.value.avatarUrl"
-              />
+              >
               <UserCircleIcon v-else aria-hidden="true" class="size-4" />
               {{ auth.user.value.displayName }}
             </UiBadge>

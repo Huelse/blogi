@@ -146,7 +146,7 @@ async function saveProfileSettings() {
             :alt="t('admin.settings.profile.avatarPreview')"
             class="size-14 rounded-full border border-[var(--panel-border)] object-cover"
             :src="profileAvatarUrl"
-          />
+          >
           <div
             v-else
             class="flex size-14 items-center justify-center rounded-full border border-dashed border-[var(--panel-border)] text-xs text-[var(--muted)]"
@@ -160,11 +160,13 @@ async function saveProfileSettings() {
             :disabled="uploadingProfileAvatar || savingProfile"
             type="file"
             @change="uploadProfileAvatar"
-          />
+          >
         </div>
 
         <div>
-          <UiLabel for="profile-display-name">{{ t('admin.settings.profile.displayName') }}</UiLabel>
+          <UiLabel for="profile-display-name"
+            >{{ t('admin.settings.profile.displayName') }}</UiLabel
+          >
           <UiInput
             id="profile-display-name"
             v-model="profileDisplayName"

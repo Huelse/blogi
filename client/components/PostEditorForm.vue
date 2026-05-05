@@ -235,15 +235,17 @@ const submitting = computed(() => props.submitting)
             :disabled="coverUploading || submitting"
             type="file"
             @change="uploadCover"
-          />
-          <p v-if="coverUploading" class="text-muted text-xs">{{ t('postEditor.uploadingCover') }}</p>
+          >
+          <p v-if="coverUploading" class="text-muted text-xs">
+            {{ t('postEditor.uploadingCover') }}
+          </p>
           <p v-if="coverUploadError" class="text-sm text-red-500">{{ coverUploadError }}</p>
           <img
             v-if="form.coverUrl"
             :alt="t('postEditor.coverPreview')"
             class="max-h-56 w-full rounded-md border border-[var(--panel-border)] object-cover"
             :src="form.coverUrl"
-          />
+          >
         </div>
 
         <div class="grid gap-5 md:grid-cols-2">

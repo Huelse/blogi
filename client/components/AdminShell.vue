@@ -67,7 +67,7 @@ async function logout() {
             :alt="auth.user.value.displayName"
             class="size-9 rounded-full border border-[var(--panel-border)] object-cover"
             :src="auth.user.value.avatarUrl"
-          />
+          >
           <p v-else class="size-9 rounded-full border border-dashed border-[var(--panel-border)]" />
           <p class="text-title text-lg font-semibold">{{ auth.user.value.displayName }}</p>
         </div>

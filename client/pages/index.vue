@@ -2,8 +2,8 @@
 import {
   BookOpenIcon,
   ChatBubbleLeftEllipsisIcon,
-  EyeIcon,
   ExclamationTriangleIcon,
+  EyeIcon,
   FolderIcon,
   HeartIcon,
   TagIcon,
@@ -155,57 +155,57 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
               :alt="post.title"
               class="h-44 w-full border-b border-[var(--panel-border)] object-cover"
               :src="post.coverUrl"
-            />
-            <div class="p-5">
-            <h2 class="text-title line-clamp-2 text-2xl font-semibold tracking-tight">
-              {{ post.title }}
-            </h2>
-            <p class="text-body mt-4 line-clamp-3 text-sm leading-7">{{ post.summary }}</p>
-
-            <div v-if="post.category || post.tags?.length" class="mt-4 flex flex-wrap gap-2">
-              <UiBadge v-if="post.category" class="gap-1.5 px-3 py-1 text-xs" variant="muted">
-                <FolderIcon aria-hidden="true" class="size-3.5" />
-                {{ post.category.name }}
-              </UiBadge>
-              <UiBadge
-                v-for="tag in post.tags"
-                :key="tag.id"
-                class="gap-1.5 px-3 py-1 text-xs"
-                variant="outline"
-              >
-                <TagIcon aria-hidden="true" class="size-3.5" />
-                {{ tag.name }}
-              </UiBadge>
-            </div>
-
-            <div
-              class="mt-auto flex flex-col gap-4 pt-6 sm:flex-row sm:items-end sm:justify-between"
             >
-              <div class="meta-row order-2 sm:order-1">
-                <span>{{ post.author.displayName }}</span>
-                <span>{{ formatDateTime(post.updatedAt, locale) }}</span>
-                <span class="inline-flex items-center gap-1.5">
-                  <ChatBubbleLeftEllipsisIcon aria-hidden="true" class="size-4" />
-                  {{ post.commentCount }}
-                </span>
-                <span class="inline-flex items-center gap-1.5">
-                  <HeartIcon aria-hidden="true" class="size-4" />
-                  {{ post.likeCount }}
-                </span>
-                <span class="inline-flex items-center gap-1.5">
-                  <EyeIcon aria-hidden="true" class="size-4" />
-                  {{ post.viewCount }}
+            <div class="p-5">
+              <h2 class="text-title line-clamp-2 text-2xl font-semibold tracking-tight">
+                {{ post.title }}
+              </h2>
+              <p class="text-body mt-4 line-clamp-3 text-sm leading-7">{{ post.summary }}</p>
+
+              <div v-if="post.category || post.tags?.length" class="mt-4 flex flex-wrap gap-2">
+                <UiBadge v-if="post.category" class="gap-1.5 px-3 py-1 text-xs" variant="muted">
+                  <FolderIcon aria-hidden="true" class="size-3.5" />
+                  {{ post.category.name }}
+                </UiBadge>
+                <UiBadge
+                  v-for="tag in post.tags"
+                  :key="tag.id"
+                  class="gap-1.5 px-3 py-1 text-xs"
+                  variant="outline"
+                >
+                  <TagIcon aria-hidden="true" class="size-3.5" />
+                  {{ tag.name }}
+                </UiBadge>
+              </div>
+
+              <div
+                class="mt-auto flex flex-col gap-4 pt-6 sm:flex-row sm:items-end sm:justify-between"
+              >
+                <div class="meta-row order-2 sm:order-1">
+                  <span>{{ post.author.displayName }}</span>
+                  <span>{{ formatDateTime(post.updatedAt, locale) }}</span>
+                  <span class="inline-flex items-center gap-1.5">
+                    <ChatBubbleLeftEllipsisIcon aria-hidden="true" class="size-4" />
+                    {{ post.commentCount }}
+                  </span>
+                  <span class="inline-flex items-center gap-1.5">
+                    <HeartIcon aria-hidden="true" class="size-4" />
+                    {{ post.likeCount }}
+                  </span>
+                  <span class="inline-flex items-center gap-1.5">
+                    <EyeIcon aria-hidden="true" class="size-4" />
+                    {{ post.viewCount }}
+                  </span>
+                </div>
+                <span
+                  :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
+                  aria-hidden="true"
+                  class="order-1 self-start sm:order-2 sm:self-auto"
+                >
+                  <BookOpenIcon aria-hidden="true" class="size-4" />
+                  {{ t('home.readMore') }}
                 </span>
               </div>
-              <span
-                :class="buttonVariants({ variant: 'secondary', size: 'sm' })"
-                aria-hidden="true"
-                class="order-1 self-start sm:order-2 sm:self-auto"
-              >
-                <BookOpenIcon aria-hidden="true" class="size-4" />
-                {{ t('home.readMore') }}
-              </span>
-            </div>
             </div>
           </NuxtLink>
         </div>
@@ -223,7 +223,7 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
                 :alt="post.title"
                 class="mb-5 max-h-64 w-full rounded-md border border-[var(--panel-border)] object-cover"
                 :src="post.coverUrl"
-              />
+              >
               <div class="meta-row">
                 <span>{{ post.author.displayName }}</span>
                 <span>{{ formatDateTime(post.updatedAt, locale) }}</span>

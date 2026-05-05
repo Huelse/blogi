@@ -134,7 +134,7 @@ async function uploadAvatar(event: Event) {
                 :alt="t('visitorProfile.avatarPreview')"
                 class="size-12 rounded-full border border-[var(--panel-border)] object-cover"
                 :src="avatarUrl"
-              />
+              >
               <div
                 v-else
                 class="flex size-12 items-center justify-center rounded-full border border-dashed border-[var(--panel-border)] text-[var(--muted)]"
@@ -149,9 +149,11 @@ async function uploadAvatar(event: Event) {
                 :disabled="avatarPending || pending"
                 type="file"
                 @change="uploadAvatar"
-              />
+              >
             </div>
-            <p v-if="avatarPending" class="text-muted text-xs">{{ t('visitorProfile.uploading') }}</p>
+            <p v-if="avatarPending" class="text-muted text-xs">
+              {{ t('visitorProfile.uploading') }}
+            </p>
           </div>
 
           <div class="space-y-2">

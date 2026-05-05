@@ -262,7 +262,7 @@ async function handleVisitorProfileSaved() {
             :alt="post.title"
             class="mt-6 max-h-[360px] w-full rounded-md border border-[var(--panel-border)] object-cover"
             :src="post.coverUrl"
-          />
+          >
 
           <div v-if="post.category || post.tags?.length" class="mt-6 flex flex-wrap gap-2">
             <NuxtLink
@@ -372,7 +372,7 @@ async function handleVisitorProfileSaved() {
                     :alt="comment.author.displayName"
                     class="size-7 rounded-full border border-[var(--panel-border)] object-cover"
                     :src="comment.author.avatarUrl"
-                  />
+                  >
                   <span>{{ comment.author.displayName }}</span>
                   <span>{{ formatDateTime(comment.createdAt, locale) }}</span>
                 </div>
