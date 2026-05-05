@@ -30,6 +30,7 @@ public class VisitorService {
         var fingerprintHash = normalizeFingerprint(request.fingerprintHash());
         var displayName = normalizeDisplayName(request.displayName());
         var email = normalizeEmail(request.email());
+        var avatarUrl = normalizeOptionalAssetUrl(request.avatarUrl(), "头像地址格式不正确");
 
         var emailOwner = findByEmail(email);
         if (emailOwner != null && !Objects.equals(emailOwner.getFingerprintHash(), fingerprintHash)) {
@@ -43,6 +44,7 @@ public class VisitorService {
             visitor.setFingerprintHash(fingerprintHash);
             visitor.setDisplayName(displayName);
             visitor.setEmail(email);
+            visitor.setAvatarUrl(avatarUrl);
             visitor.setCreatedAt(now);
             visitor.setUpdatedAt(now);
             visitorIdentityMapper.insert(visitor);
@@ -51,6 +53,7 @@ public class VisitorService {
 
         visitor.setDisplayName(displayName);
         visitor.setEmail(email);
+        visitor.setAvatarUrl(avatarUrl);
         visitor.setUpdatedAt(now);
         visitorIdentityMapper.updateById(visitor);
         return toResponse(visitor);
@@ -85,6 +88,7 @@ public class VisitorService {
             visitor.getFingerprintHash(),
             visitor.getDisplayName(),
             visitor.getEmail(),
+            visitor.getAvatarUrl(),
             visitor.getCreatedAt(),
             visitor.getUpdatedAt()
         );
@@ -108,6 +112,20 @@ public class VisitorService {
             throw new ApiException(400, "邮箱不能为空");
         }
         return normalized;
+    }
+
+    private String normalizeOptionalAssetUrl(String rawUrl, String invalidMessage) {
+        if (rawUrl == null) {
+            return null;
+        }
+        var value = rawUrl.trim();
+        if (value.isEmpty()) {
+            return null;
+        }
+        if (value.startsWith("/") || value.startsWith("http://") || value.startsWith("https://")) {
+            return value;
+        }
+        throw new ApiException(400, invalidMessage);
     }
 
     private boolean hasText(String value) {

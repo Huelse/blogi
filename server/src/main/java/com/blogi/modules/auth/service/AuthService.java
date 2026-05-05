@@ -5,6 +5,7 @@ import com.blogi.modules.auth.dto.AuthResponse;
 import com.blogi.modules.auth.dto.LoginRequest;
 import com.blogi.modules.auth.dto.RegisterRequest;
 import com.blogi.modules.auth.dto.UserProfileResponse;
+import com.blogi.modules.auth.dto.UserProfileUpdateRequest;
 import com.blogi.modules.auth.entity.UserAccount;
 import com.blogi.modules.auth.mapper.UserAccountMapper;
 import com.blogi.security.JwtService;
@@ -60,7 +61,20 @@ public class AuthService {
         if (principal == null || principal.id() == null) {
             throw new ApiException(401, "未登录");
         }
-        return new UserProfileResponse(principal.id(), principal.username(), principal.displayName());
+        return toUserProfile(getRequiredUser(principal.id()));
+    }
+
+    public UserProfileResponse updateCurrentUser(UserPrincipal principal, UserProfileUpdateRequest request) {
+        if (principal == null || principal.id() == null) {
+            throw new ApiException(401, "未登录");
+        }
+
+        var user = getRequiredUser(principal.id());
+        user.setDisplayName(request.displayName().trim());
+        user.setAvatarUrl(normalizeOptionalAssetUrl(request.avatarUrl(), "头像地址格式不正确"));
+        user.setUpdatedAt(LocalDateTime.now());
+        userAccountMapper.updateById(user);
+        return toUserProfile(user);
     }
 
     public UserAccount getRequiredUser(Long userId) {
@@ -77,6 +91,20 @@ public class AuthService {
     }
 
     public static UserProfileResponse toUserProfile(UserAccount user) {
-        return new UserProfileResponse(user.getId(), user.getUsername(), user.getDisplayName());
+        return new UserProfileResponse(user.getId(), user.getUsername(), user.getDisplayName(), user.getAvatarUrl());
+    }
+
+    private String normalizeOptionalAssetUrl(String rawUrl, String invalidMessage) {
+        if (rawUrl == null) {
+            return null;
+        }
+        var value = rawUrl.trim();
+        if (value.isEmpty()) {
+            return null;
+        }
+        if (value.startsWith("/") || value.startsWith("http://") || value.startsWith("https://")) {
+            return value;
+        }
+        throw new ApiException(400, invalidMessage);
     }
 }

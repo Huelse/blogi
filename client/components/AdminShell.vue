@@ -61,9 +61,16 @@ async function logout() {
         <p class="text-brand text-xs font-semibold uppercase tracking-[0.3em]">
           {{ t('app.admin') }}
         </p>
-        <p v-if="auth.user.value" class="text-title mt-3 text-lg font-semibold">
-          {{ auth.user.value.displayName }}
-        </p>
+        <div v-if="auth.user.value" class="mt-3 flex items-center gap-3">
+          <img
+            v-if="auth.user.value.avatarUrl"
+            :alt="auth.user.value.displayName"
+            class="size-9 rounded-full border border-[var(--panel-border)] object-cover"
+            :src="auth.user.value.avatarUrl"
+          />
+          <p v-else class="size-9 rounded-full border border-dashed border-[var(--panel-border)]" />
+          <p class="text-title text-lg font-semibold">{{ auth.user.value.displayName }}</p>
+        </div>
         <p class="text-muted mt-1 text-sm">{{ t('admin.shell.subtitle') }}</p>
       </div>
 

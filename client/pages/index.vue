@@ -146,9 +146,16 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
           <NuxtLink
             v-for="post in sortedPosts"
             :key="post.id"
-            class="flex min-h-[260px] flex-col rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-bg)] p-5 transition hover:border-[var(--secondary-border-hover)] hover:bg-[var(--secondary-bg-hover)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[color-mix(in_srgb,var(--brand)_16%,transparent)]"
+            class="flex min-h-[260px] flex-col overflow-hidden rounded-[8px] border border-[var(--panel-border)] bg-[var(--panel-bg)] transition hover:border-[var(--secondary-border-hover)] hover:bg-[var(--secondary-bg-hover)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[color-mix(in_srgb,var(--brand)_16%,transparent)]"
             :to="`/posts/${post.id}`"
           >
+            <img
+              v-if="post.coverUrl"
+              :alt="post.title"
+              class="h-44 w-full border-b border-[var(--panel-border)] object-cover"
+              :src="post.coverUrl"
+            />
+            <div class="p-5">
             <h2 class="text-title line-clamp-2 text-2xl font-semibold tracking-tight">
               {{ post.title }}
             </h2>
@@ -194,6 +201,7 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
                 {{ t('home.readMore') }}
               </span>
             </div>
+            </div>
           </NuxtLink>
         </div>
 
@@ -205,6 +213,12 @@ function filterTarget(filters: { category?: string | null; tag?: string | null }
             :to="`/posts/${post.id}`"
           >
             <div>
+              <img
+                v-if="post.coverUrl"
+                :alt="post.title"
+                class="mb-5 max-h-64 w-full rounded-md border border-[var(--panel-border)] object-cover"
+                :src="post.coverUrl"
+              />
               <div class="meta-row">
                 <span>{{ post.author.displayName }}</span>
                 <span>{{ formatDateTime(post.updatedAt, locale) }}</span>

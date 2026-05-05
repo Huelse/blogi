@@ -1,6 +1,8 @@
 package com.blogi.config;
 
 import com.blogi.common.api.ApiResponse;
+import com.blogi.modules.file.config.UploadProperties;
+import com.blogi.modules.file.config.UploadStorageType;
 import com.blogi.security.JwtAuthenticationFilter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -17,6 +19,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,6 +36,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(
         HttpSecurity http,
         JwtAuthenticationFilter jwtAuthenticationFilter,
+        UploadProperties uploadProperties,
         AuthenticationEntryPoint authenticationEntryPoint,
         AccessDeniedHandler accessDeniedHandler
     ) throws Exception {
@@ -42,19 +46,24 @@ public class SecurityConfig {
             .cors(cors -> {
             })
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/health", "/api/auth/login", "/api/auth/register").permitAll()
-                .requestMatchers("/api/visitors/**").permitAll()
-                .requestMatchers("/api/auth/me").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/settings").permitAll()
-                .requestMatchers("/api/posts/mine").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/posts").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/posts/*/comments").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/posts/*/likes").permitAll()
-                .requestMatchers(HttpMethod.DELETE, "/api/posts/*/likes").permitAll()
-                .anyRequest().authenticated()
-            )
+            .authorizeHttpRequests(auth -> {
+                auth.requestMatchers("/api/health", "/api/auth/login", "/api/auth/register").permitAll();
+                auth.requestMatchers("/api/visitors/**").permitAll();
+                auth.requestMatchers(HttpMethod.POST, "/api/files/upload").permitAll();
+                var localPublicAssetPath = localPublicAssetPath(uploadProperties);
+                if (localPublicAssetPath != null) {
+                    auth.requestMatchers(HttpMethod.GET, localPublicAssetPath).permitAll();
+                }
+                auth.requestMatchers("/api/auth/me").authenticated();
+                auth.requestMatchers(HttpMethod.GET, "/api/settings").permitAll();
+                auth.requestMatchers("/api/posts/mine").authenticated();
+                auth.requestMatchers(HttpMethod.GET, "/api/posts").permitAll();
+                auth.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll();
+                auth.requestMatchers(HttpMethod.POST, "/api/posts/*/comments").permitAll();
+                auth.requestMatchers(HttpMethod.POST, "/api/posts/*/likes").permitAll();
+                auth.requestMatchers(HttpMethod.DELETE, "/api/posts/*/likes").permitAll();
+                auth.anyRequest().authenticated();
+            })
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(authenticationEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler)
@@ -100,5 +109,28 @@ public class SecurityConfig {
         return """
             {"success":%s,"data":null,"message":"%s"}
             """.formatted(response.success(), response.message());
+    }
+
+    private String localPublicAssetPath(UploadProperties uploadProperties) {
+        if (uploadProperties.getStorage() != UploadStorageType.LOCAL) {
+            return null;
+        }
+
+        var configuredPath = uploadProperties.getLocal().getPublicPath();
+        if (!StringUtils.hasText(configuredPath)) {
+            return "/uploads/**";
+        }
+
+        var normalized = configuredPath.trim();
+        if (normalized.startsWith("http://") || normalized.startsWith("https://")) {
+            return null;
+        }
+        if (!normalized.startsWith("/")) {
+            normalized = "/" + normalized;
+        }
+        if (normalized.endsWith("/")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+        return normalized + "/**";
     }
 }

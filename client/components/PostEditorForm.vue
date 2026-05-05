@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ArrowLeftIcon, PencilSquareIcon } from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
-import type { PostCategory, PostPayload, PostTag } from '~/types/blogi'
+import type { PostCategory, PostPayload, PostTag, UploadResponse } from '~/types/blogi'
+import { getErrorMessage } from '~/utils/errors'
 import { renderMarkdown } from '~/utils/markdown'
 
 type PostEditorInitialValue = Partial<Omit<PostPayload, 'category' | 'tags'>> & {
@@ -31,21 +32,26 @@ const emit = defineEmits<{
   save: [payload: PostPayload]
 }>()
 const { t } = useI18n()
+const api = useApiClient()
 
 const form = reactive<PostPayload>({
   title: '',
   summary: '',
+  coverUrl: '',
   contentMarkdown: '',
   category: '',
   tags: [],
 })
 const tagText = ref('')
+const coverUploading = ref(false)
+const coverUploadError = ref('')
 
 watch(
   () => props.initialValue,
   (value) => {
     form.title = value.title ?? ''
     form.summary = value.summary ?? ''
+    form.coverUrl = value.coverUrl ?? ''
     form.contentMarkdown = value.contentMarkdown ?? ''
     form.category = normalizeInitialCategory(value.category)
     tagText.value = normalizeInitialTags(value.tags).join(', ')
@@ -62,10 +68,38 @@ function submit() {
   emit('save', {
     title: form.title.trim(),
     summary: form.summary.trim(),
+    coverUrl: form.coverUrl.trim(),
     contentMarkdown: form.contentMarkdown,
     category: form.category.trim(),
     tags: parseTags(tagText.value),
   })
+}
+
+async function uploadCover(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file || coverUploading.value) {
+    return
+  }
+
+  coverUploading.value = true
+  coverUploadError.value = ''
+
+  try {
+    const formData = new FormData()
+    formData.append('usage', 'POST_COVER')
+    formData.append('file', file)
+    const upload = await api<UploadResponse>('/files/upload', {
+      method: 'POST',
+      body: formData,
+    })
+    form.coverUrl = upload.url
+  } catch (error) {
+    coverUploadError.value = getErrorMessage(error, t('common.requestFailed'))
+  } finally {
+    coverUploading.value = false
+    input.value = ''
+  }
 }
 
 function normalizeInitialCategory(category: PostEditorInitialValue['category']) {
@@ -124,6 +158,33 @@ function parseTags(value: string) {
             class="min-h-[110px]"
             maxlength="280"
             :placeholder="t('postEditor.summaryPlaceholder')"
+          />
+        </div>
+
+        <div class="space-y-2">
+          <UiLabel for="coverUrl">{{ t('postEditor.coverUrl') }}</UiLabel>
+          <UiInput
+            id="coverUrl"
+            v-model="form.coverUrl"
+            maxlength="1024"
+            :placeholder="t('postEditor.coverUrlPlaceholder')"
+            type="url"
+          />
+          <input
+            id="coverUpload"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            class="flex h-12 w-full rounded-2xl border border-[var(--panel-border)] bg-[var(--field-bg)] px-4 py-3 text-sm text-[var(--title)] transition file:mr-3 file:rounded-md file:border-0 file:bg-[var(--secondary-bg)] file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-[var(--title)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[color-mix(in_srgb,var(--brand)_16%,transparent)] disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="coverUploading || submitting"
+            type="file"
+            @change="uploadCover"
+          />
+          <p v-if="coverUploading" class="text-muted text-xs">{{ t('postEditor.uploadingCover') }}</p>
+          <p v-if="coverUploadError" class="text-sm text-red-500">{{ coverUploadError }}</p>
+          <img
+            v-if="form.coverUrl"
+            :alt="t('postEditor.coverPreview')"
+            class="max-h-56 w-full rounded-md border border-[var(--panel-border)] object-cover"
+            :src="form.coverUrl"
           />
         </div>
 

@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Select;
 public interface UserAccountMapper extends BaseMapper<UserAccount> {
 
     @Select("""
-        SELECT id, username, display_name, password_hash, created_at, updated_at
+        SELECT id, username, display_name, avatar_url, password_hash, created_at, updated_at
         FROM users
         WHERE username = #{username}
         LIMIT 1

@@ -7,6 +7,7 @@ public record VisitorProfileResponse(
     String fingerprintHash,
     String displayName,
     String email,
+    String avatarUrl,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {

@@ -12,6 +12,7 @@ public class UserAccount {
     private Long id;
     private String username;
     private String displayName;
+    private String avatarUrl;
     private String passwordHash;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -46,6 +47,14 @@ public class UserAccount {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public LocalDateTime getCreatedAt() {

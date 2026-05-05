@@ -148,6 +148,7 @@ public class PostService {
         post.setCategoryId(category == null ? null : category.getId());
         post.setTitle(request.title().trim());
         post.setSummary(normalizeSummary(request.summary(), request.contentMarkdown()));
+        post.setCoverUrl(normalizeOptionalAssetUrl(request.coverUrl(), "封面地址格式不正确"));
         post.setContentMarkdown(request.contentMarkdown().trim());
         post.setCreatedAt(now);
         post.setUpdatedAt(now);
@@ -163,6 +164,7 @@ public class PostService {
         post.setCategoryId(category == null ? null : category.getId());
         post.setTitle(request.title().trim());
         post.setSummary(normalizeSummary(request.summary(), request.contentMarkdown()));
+        post.setCoverUrl(normalizeOptionalAssetUrl(request.coverUrl(), "封面地址格式不正确"));
         post.setContentMarkdown(request.contentMarkdown().trim());
         post.setUpdatedAt(LocalDateTime.now());
         postArticleMapper.updateById(post);
@@ -272,6 +274,7 @@ public class PostService {
                 post.getId(),
                 post.getTitle(),
                 post.getSummary(),
+                post.getCoverUrl(),
                 post.getCreatedAt(),
                 post.getUpdatedAt(),
                 toAuthor(usersById.get(post.getAuthorId())),
@@ -290,6 +293,7 @@ public class PostService {
             post.getId(),
             post.getTitle(),
             post.getSummary(),
+            post.getCoverUrl(),
             post.getContentMarkdown(),
             post.getCreatedAt(),
             post.getUpdatedAt(),
@@ -489,7 +493,7 @@ public class PostService {
         if (user == null) {
             throw new ApiException(404, "作者不存在");
         }
-        return new PostAuthorResponse(user.getId(), user.getUsername(), user.getDisplayName());
+        return new PostAuthorResponse(user.getId(), user.getUsername(), user.getDisplayName(), user.getAvatarUrl());
     }
 
     private PostAuthorResponse toCommentAuthor(UserAccount user, VisitorIdentity visitor) {
@@ -497,7 +501,12 @@ public class PostService {
             return toAuthor(user);
         }
         if (visitor != null) {
-            return new PostAuthorResponse(visitor.getId(), "visitor-" + visitor.getId(), visitor.getDisplayName());
+            return new PostAuthorResponse(
+                visitor.getId(),
+                "visitor-" + visitor.getId(),
+                visitor.getDisplayName(),
+                visitor.getAvatarUrl()
+            );
         }
         throw new ApiException(404, "评论作者不存在");
     }
@@ -687,6 +696,21 @@ public class PostService {
         }
         var name = rawName.replaceAll("\\s+", " ").trim();
         return name.isEmpty() ? null : name;
+    }
+
+    private String normalizeOptionalAssetUrl(String rawUrl, String invalidMessage) {
+        if (rawUrl == null) {
+            return null;
+        }
+
+        var value = rawUrl.trim();
+        if (value.isEmpty()) {
+            return null;
+        }
+        if (value.startsWith("/") || value.startsWith("http://") || value.startsWith("https://")) {
+            return value;
+        }
+        throw new ApiException(400, invalidMessage);
     }
 
     private boolean hasText(String value) {

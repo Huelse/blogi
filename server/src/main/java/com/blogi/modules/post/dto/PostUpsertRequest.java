@@ -10,6 +10,8 @@ public record PostUpsertRequest(
     String title,
     @Size(max = 280, message = "摘要不能超过 280 个字符")
     String summary,
+    @Size(max = 1024, message = "封面地址不能超过 1024 个字符")
+    String coverUrl,
     @NotBlank(message = "正文不能为空")
     @Size(max = 50000, message = "正文不能超过 50000 个字符")
     String contentMarkdown,

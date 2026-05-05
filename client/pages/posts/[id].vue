@@ -241,6 +241,12 @@ async function handleVisitorProfileSaved() {
             {{ post.title }}
           </h1>
           <p class="text-body mt-5 max-w-3xl text-lg leading-8">{{ post.summary }}</p>
+          <img
+            v-if="post.coverUrl"
+            :alt="post.title"
+            class="mt-6 max-h-[360px] w-full rounded-md border border-[var(--panel-border)] object-cover"
+            :src="post.coverUrl"
+          />
 
           <div v-if="post.category || post.tags?.length" class="mt-6 flex flex-wrap gap-2">
             <NuxtLink
@@ -344,7 +350,13 @@ async function handleVisitorProfileSaved() {
           <div v-else class="mt-8 divide-y divide-[var(--panel-border)]">
             <article v-for="comment in comments" :key="comment.id" class="py-5">
               <div class="flex flex-wrap items-start justify-between gap-3">
-                <div class="meta-row">
+                <div class="meta-row flex items-center gap-2">
+                  <img
+                    v-if="comment.author.avatarUrl"
+                    :alt="comment.author.displayName"
+                    class="size-7 rounded-full border border-[var(--panel-border)] object-cover"
+                    :src="comment.author.avatarUrl"
+                  />
                   <span>{{ comment.author.displayName }}</span>
                   <span>{{ formatDateTime(comment.createdAt, locale) }}</span>
                 </div>

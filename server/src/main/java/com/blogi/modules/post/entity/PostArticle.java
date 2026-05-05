@@ -17,6 +17,7 @@ public class PostArticle {
     private Long categoryId;
     private String title;
     private String summary;
+    private String coverUrl;
     private String contentMarkdown;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -67,6 +68,14 @@ public class PostArticle {
 
     public void setContentMarkdown(String contentMarkdown) {
         this.contentMarkdown = contentMarkdown;
+    }
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
     }
 
     public LocalDateTime getCreatedAt() {

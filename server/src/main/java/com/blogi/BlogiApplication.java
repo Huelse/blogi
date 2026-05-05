@@ -5,7 +5,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.blogi.modules")
+@MapperScan({
+    "com.blogi.modules.auth.mapper",
+    "com.blogi.modules.post.mapper",
+    "com.blogi.modules.settings.mapper",
+    "com.blogi.modules.visitor.mapper",
+})
 public class BlogiApplication {
 
     public static void main(String[] args) {

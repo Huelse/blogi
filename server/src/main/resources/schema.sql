@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(32) NOT NULL UNIQUE,
     display_name VARCHAR(40) NOT NULL,
+    avatar_url VARCHAR(1024),
     password_hash VARCHAR(100) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS visitors (
     fingerprint_hash VARCHAR(64) NOT NULL UNIQUE,
     display_name VARCHAR(40) NOT NULL,
     email VARCHAR(254) NOT NULL UNIQUE,
+    avatar_url VARCHAR(1024),
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
@@ -41,12 +43,16 @@ CREATE TABLE IF NOT EXISTS posts (
     category_id BIGINT REFERENCES categories (id) ON DELETE SET NULL,
     title VARCHAR(120) NOT NULL,
     summary VARCHAR(280) NOT NULL,
+    cover_url VARCHAR(1024),
     content_markdown TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL
 );
 
 ALTER TABLE posts ADD COLUMN IF NOT EXISTS category_id BIGINT;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS cover_url VARCHAR(1024);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(1024);
+ALTER TABLE visitors ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(1024);
 
 CREATE INDEX IF NOT EXISTS idx_posts_author_id ON posts (author_id);
 CREATE INDEX IF NOT EXISTS idx_posts_category_id ON posts (category_id);

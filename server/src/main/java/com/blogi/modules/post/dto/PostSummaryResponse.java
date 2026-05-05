@@ -7,6 +7,7 @@ public record PostSummaryResponse(
     Long id,
     String title,
     String summary,
+    String coverUrl,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     PostAuthorResponse author,

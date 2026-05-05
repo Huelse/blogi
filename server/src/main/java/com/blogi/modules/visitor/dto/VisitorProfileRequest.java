@@ -17,6 +17,9 @@ public record VisitorProfileRequest(
     @NotBlank(message = "邮箱不能为空")
     @Email(message = "邮箱格式不正确")
     @Size(max = 254, message = "邮箱不能超过 254 个字符")
-    String email
+    String email,
+
+    @Size(max = 1024, message = "头像地址不能超过 1024 个字符")
+    String avatarUrl
 ) {
 }

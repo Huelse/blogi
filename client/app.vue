@@ -81,8 +81,14 @@ async function toggleLocale() {
               <Cog6ToothIcon aria-hidden="true" class="size-4" />
               {{ t('app.admin') }}
             </NuxtLink>
-            <UiBadge class="hidden md:inline-flex" variant="muted">
-              <UserCircleIcon aria-hidden="true" class="size-4" />
+            <UiBadge class="hidden gap-2 md:inline-flex" variant="muted">
+              <img
+                v-if="auth.user.value.avatarUrl"
+                :alt="auth.user.value.displayName"
+                class="size-4 rounded-full object-cover"
+                :src="auth.user.value.avatarUrl"
+              />
+              <UserCircleIcon v-else aria-hidden="true" class="size-4" />
               {{ auth.user.value.displayName }}
             </UiBadge>
             <UiButton size="sm" variant="secondary" type="button" @click="logout">

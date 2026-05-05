@@ -6,15 +6,18 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.springframework.mock.web.MockMultipartFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
@@ -24,14 +27,29 @@ class BlogiApiIntegrationTests {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
+        clearDatabase();
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .apply(springSecurity())
             .build();
+    }
+
+    private void clearDatabase() {
+        jdbcTemplate.execute("DELETE FROM post_likes");
+        jdbcTemplate.execute("DELETE FROM comments");
+        jdbcTemplate.execute("DELETE FROM post_tags");
+        jdbcTemplate.execute("DELETE FROM posts");
+        jdbcTemplate.execute("DELETE FROM tags");
+        jdbcTemplate.execute("DELETE FROM categories");
+        jdbcTemplate.execute("DELETE FROM visitors");
+        jdbcTemplate.execute("DELETE FROM users");
+        jdbcTemplate.execute("DELETE FROM site_settings");
     }
 
     @Test
@@ -353,5 +371,125 @@ class BlogiApiIntegrationTests {
         mockMvc.perform(get("/api/settings"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data.footerHtml", is("<p>Public footer</p>")));
+    }
+
+    @Test
+    void userAndVisitorCanUploadImagesAndBindCoverAvatar() throws Exception {
+        var registerResponse = mockMvc.perform(post("/api/auth/register")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "username": "uploaduser",
+                      "displayName": "Upload User",
+                      "password": "password123"
+                    }
+                    """))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        var token = JsonTestUtils.read(registerResponse, "$.data.token");
+        var coverFile = new MockMultipartFile(
+            "file",
+            "cover.png",
+            "image/png",
+            "fake-png-content".getBytes()
+        );
+
+        var uploadCoverResponse = mockMvc.perform(multipart("/api/files/upload")
+                .file(coverFile)
+                .param("usage", "POST_COVER")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.contentType", is("image/png")))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        var coverUrl = JsonTestUtils.read(uploadCoverResponse, "$.data.url");
+
+        mockMvc.perform(post("/api/posts")
+                .header("Authorization", "Bearer " + token)
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "title": "Post with cover",
+                      "summary": "Has image",
+                      "coverUrl": "%s",
+                      "contentMarkdown": "# Cover\\n\\nBody."
+                    }
+                    """.formatted(coverUrl)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.coverUrl", is(coverUrl)));
+
+        var userAvatarFile = new MockMultipartFile(
+            "file",
+            "user-avatar.webp",
+            "image/webp",
+            "fake-webp-content".getBytes()
+        );
+        var uploadUserAvatarResponse = mockMvc.perform(multipart("/api/files/upload")
+                .file(userAvatarFile)
+                .param("usage", "USER_AVATAR")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+        var userAvatarUrl = JsonTestUtils.read(uploadUserAvatarResponse, "$.data.url");
+
+        mockMvc.perform(put("/api/auth/me")
+                .header("Authorization", "Bearer " + token)
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "displayName": "Upload User Updated",
+                      "avatarUrl": "%s"
+                    }
+                    """.formatted(userAvatarUrl)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.displayName", is("Upload User Updated")))
+            .andExpect(jsonPath("$.data.avatarUrl", is(userAvatarUrl)));
+
+        var visitorFingerprint = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+        var avatarFile = new MockMultipartFile(
+            "file",
+            "avatar.jpg",
+            "image/jpeg",
+            "fake-jpg-content".getBytes()
+        );
+
+        var uploadAvatarResponse = mockMvc.perform(multipart("/api/files/upload")
+                .file(avatarFile)
+                .param("usage", "VISITOR_AVATAR")
+                .param("fingerprintHash", visitorFingerprint))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.contentType", is("image/jpeg")))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        var avatarUrl = JsonTestUtils.read(uploadAvatarResponse, "$.data.url");
+
+        mockMvc.perform(put("/api/visitors/profile")
+                .contentType(APPLICATION_JSON)
+                .content("""
+                    {
+                      "fingerprintHash": "%s",
+                      "displayName": "Avatar Visitor",
+                      "email": "avatar-visitor@example.com",
+                      "avatarUrl": "%s"
+                    }
+                    """.formatted(visitorFingerprint, avatarUrl)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.avatarUrl", is(avatarUrl)));
+
+        mockMvc.perform(multipart("/api/files/upload")
+                .file(new MockMultipartFile("file", "bad.txt", "text/plain", "oops".getBytes()))
+                .param("usage", "POST_COVER")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message", is("不支持的文件类型")));
     }
 }

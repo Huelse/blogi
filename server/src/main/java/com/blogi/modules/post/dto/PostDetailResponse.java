@@ -7,6 +7,7 @@ public record PostDetailResponse(
     Long id,
     String title,
     String summary,
+    String coverUrl,
     String contentMarkdown,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,

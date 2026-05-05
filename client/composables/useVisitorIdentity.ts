@@ -70,6 +70,7 @@ export function useVisitorIdentity() {
         fingerprintHash: currentFingerprintHash,
         displayName: payload.displayName,
         email: payload.email,
+        avatarUrl: payload.avatarUrl,
       } satisfies VisitorProfileRequest,
     })
     profile.value = savedProfile

@@ -19,3 +19,9 @@ blogi:
   security:
     jwt-secret: test-secret-for-jwt-signing-1234567890
     jwt-expiration-seconds: 3600
+  upload:
+    storage: LOCAL
+    max-size-bytes: 5242880
+    local:
+      root-dir: ./target/test-uploads
+      public-path: /uploads

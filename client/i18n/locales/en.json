@@ -82,6 +82,9 @@
   "postEditor": {
     "category": "Category",
     "categoryPlaceholder": "For example: Engineering Log",
+    "coverPreview": "Cover preview",
+    "coverUrl": "Cover URL",
+    "coverUrlPlaceholder": "Optional. Supports http(s) or /uploads/...",
     "content": "Markdown content",
     "contentPlaceholder": "# Title",
     "previewFallback": "## Preview\n\nWrite your Markdown content here.",
@@ -89,9 +92,12 @@
     "summaryPlaceholder": "Optional. If empty, the backend will generate one from the content.",
     "tags": "Tags",
     "tagsPlaceholder": "Separate with commas, for example: Nuxt, Spring",
-    "title": "Title"
+    "title": "Title",
+    "uploadingCover": "Uploading cover..."
   },
   "visitorProfile": {
+    "avatar": "Avatar",
+    "avatarPreview": "Avatar preview",
     "cancel": "Cancel",
     "close": "Close",
     "displayName": "Display name",
@@ -99,7 +105,8 @@
     "eyebrow": "Profile",
     "pending": "Saving...",
     "submit": "Save and continue",
-    "title": "Complete your visitor profile"
+    "title": "Complete your visitor profile",
+    "uploading": "Uploading avatar..."
   },
   "admin": {
     "nav": {
@@ -151,6 +158,16 @@
     },
     "settings": {
       "description": "Adjust how the blog is presented on the public site.",
+      "profile": {
+        "avatarPreview": "Avatar preview",
+        "description": "Update the current user's display name and avatar.",
+        "displayName": "Display name",
+        "noAvatar": "No avatar",
+        "save": "Save profile",
+        "saved": "Profile saved",
+        "title": "Profile",
+        "uploading": "Uploading avatar..."
+      },
       "footer": {
         "clear": "Clear editor",
         "description": "Customize the public footer HTML. After saving, it appears on the home page and post detail pages.",

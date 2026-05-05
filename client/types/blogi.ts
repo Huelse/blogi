@@ -8,6 +8,7 @@ export interface UserProfile {
   id: number
   username: string
   displayName: string
+  avatarUrl: string | null
 }
 
 export interface AuthSession {
@@ -19,6 +20,7 @@ export interface PostAuthor {
   id: number
   username: string
   displayName: string
+  avatarUrl: string | null
 }
 
 export interface PostCategory {
@@ -37,6 +39,7 @@ export interface PostSummary {
   id: number
   title: string
   summary: string
+  coverUrl: string | null
   createdAt: string
   updatedAt: string
   author: PostAuthor
@@ -53,6 +56,7 @@ export interface PostDetail extends PostSummary {
 export interface PostPayload {
   title: string
   summary: string
+  coverUrl: string
   contentMarkdown: string
   category: string
   tags: string[]
@@ -81,6 +85,7 @@ export interface VisitorProfile {
   fingerprintHash: string
   displayName: string
   email: string
+  avatarUrl: string | null
   createdAt: string
   updatedAt: string
 }
@@ -88,6 +93,7 @@ export interface VisitorProfile {
 export interface VisitorProfilePayload {
   displayName: string
   email: string
+  avatarUrl: string
 }
 
 export interface VisitorProfileRequest extends VisitorProfilePayload {
@@ -105,4 +111,13 @@ export interface PostLikePayload {
 export interface PostLikeState {
   likeCount: number
   liked: boolean
+}
+
+export type UploadUsage = 'POST_COVER' | 'USER_AVATAR' | 'VISITOR_AVATAR'
+
+export interface UploadResponse {
+  key: string
+  url: string
+  contentType: string
+  size: number
 }

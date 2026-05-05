@@ -82,6 +82,9 @@
   "postEditor": {
     "category": "分类",
     "categoryPlaceholder": "例如：工程日志",
+    "coverPreview": "封面预览",
+    "coverUrl": "封面图 URL",
+    "coverUrlPlaceholder": "可选，支持 http(s) 或 /uploads/...",
     "content": "Markdown 正文",
     "contentPlaceholder": "# 标题",
     "previewFallback": "## 预览\n\n在这里输入 Markdown 正文。",
@@ -89,9 +92,12 @@
     "summaryPlaceholder": "可选，不填时后端会从正文自动生成摘要",
     "tags": "标签",
     "tagsPlaceholder": "用逗号分隔，例如：Nuxt, Spring",
-    "title": "标题"
+    "title": "标题",
+    "uploadingCover": "封面上传中..."
   },
   "visitorProfile": {
+    "avatar": "头像",
+    "avatarPreview": "头像预览",
     "cancel": "取消",
     "close": "关闭",
     "displayName": "昵称",
@@ -99,7 +105,8 @@
     "eyebrow": "访客资料",
     "pending": "保存中...",
     "submit": "保存并继续",
-    "title": "填写访客资料"
+    "title": "填写访客资料",
+    "uploading": "头像上传中..."
   },
   "admin": {
     "nav": {
@@ -151,6 +158,16 @@
     },
     "settings": {
       "description": "调整博客前台展示相关配置。",
+      "profile": {
+        "avatarPreview": "头像预览",
+        "description": "更新当前登录用户的昵称和头像。",
+        "displayName": "昵称",
+        "noAvatar": "无头像",
+        "save": "保存资料",
+        "saved": "资料已保存",
+        "title": "个人资料",
+        "uploading": "头像上传中..."
+      },
       "footer": {
         "clear": "清空编辑内容",
         "description": "自定义前台页脚 HTML，保存后会显示在首页和文章详情页底部。",
