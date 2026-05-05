@@ -154,6 +154,7 @@
       "footer": {
         "clear": "清空编辑内容",
         "description": "自定义前台页脚 HTML，保存后会显示在首页和文章详情页底部。",
+        "placeholder": "© 2026 Blogi。Nuxt 与 Spring Boot 搭建。",
         "empty": "页脚为空，前台页面不会显示页脚区域。",
         "hint": "该内容会作为受信任 HTML 渲染，请只保存你自己编写或确认安全的模板；清空并保存后前台不会显示页脚。",
         "label": "HTML 模板",

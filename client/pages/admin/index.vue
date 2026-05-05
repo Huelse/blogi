@@ -4,10 +4,6 @@ import { buttonVariants } from '~/components/ui/button/buttonVariants'
 import type { PostSummary } from '~/types/blogi'
 import { formatDateTime } from '~/utils/date'
 
-definePageMeta({
-  middleware: 'auth',
-})
-
 const api = useApiClient()
 const { locale, t } = useI18n()
 

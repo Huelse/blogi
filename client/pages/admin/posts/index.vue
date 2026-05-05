@@ -14,10 +14,6 @@ import type { PostSummary } from '~/types/blogi'
 import { formatDateTime } from '~/utils/date'
 import { getErrorMessage } from '~/utils/errors'
 
-definePageMeta({
-  middleware: 'auth',
-})
-
 const api = useApiClient()
 const { locale, t } = useI18n()
 const deletingId = ref<number | null>(null)

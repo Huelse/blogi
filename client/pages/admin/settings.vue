@@ -4,10 +4,6 @@ import type { PostListLayout } from '~/composables/useBlogSettings'
 import type { BlogSettings } from '~/types/blogi'
 import { getErrorMessage } from '~/utils/errors'
 
-definePageMeta({
-  middleware: 'auth',
-})
-
 const api = useApiClient()
 const blogSettings = useBlogSettings()
 const { t } = useI18n()
@@ -165,7 +161,7 @@ function clearFooterSettings() {
             id="footer-html"
             v-model="footerHtml"
             class="min-h-48 font-mono text-xs leading-6"
-            placeholder="<p>© 2026 Blogi. Built with Nuxt and Spring Boot.</p>"
+            :placeholder="t('admin.settings.footer.placeholder')"
             spellcheck="false"
           />
           <p class="text-muted mt-2 text-xs leading-6">{{ t('admin.settings.footer.hint') }}</p>

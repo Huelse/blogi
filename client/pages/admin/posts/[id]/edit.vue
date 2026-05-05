@@ -3,10 +3,6 @@ import { ExclamationTriangleIcon } from '@heroicons/vue/20/solid'
 import type { PostDetail, PostPayload } from '~/types/blogi'
 import { getErrorMessage } from '~/utils/errors'
 
-definePageMeta({
-  middleware: 'auth',
-})
-
 const auth = useAuth()
 const route = useRoute()
 const api = useApiClient()

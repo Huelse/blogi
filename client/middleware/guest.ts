@@ -1,6 +1,10 @@
-import { resolveAuthRedirect } from '~/utils/authRedirect'
+import { isAuthEntryPath, resolveAuthRedirect } from '~/utils/authRedirect'
 
-export default defineNuxtRouteMiddleware((to) => {
+export default defineNuxtRouteMiddleware((to, _from) => {
+  if (!isAuthEntryPath(to.path)) {
+    return
+  }
+
   const auth = useAuth()
 
   if (!auth.isAuthenticated.value) {

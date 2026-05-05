@@ -1,5 +1,6 @@
-const authEntryPaths = new Set(['/login', '/register'])
+const AUTH_ENTRY_PATHS = new Set(['/login', '/register'])
 const defaultAuthenticatedPath = '/admin'
+const adminPath = '/admin'
 
 function isSafeInternalPath(path: string) {
   return path.startsWith('/') && !path.startsWith('//')
@@ -20,9 +21,17 @@ export function resolveAuthRedirect(redirect: unknown, fallback = defaultAuthent
   }
 
   const [pathname] = redirect.split('?')
-  if (authEntryPaths.has(pathname)) {
+  if (!pathname || AUTH_ENTRY_PATHS.has(pathname)) {
     return fallback
   }
 
   return redirect
+}
+
+export function isAuthEntryPath(pathname: string) {
+  return AUTH_ENTRY_PATHS.has(pathname)
+}
+
+export function isAdminRoute(pathname: string) {
+  return pathname === adminPath || pathname.startsWith(`${adminPath}/`)
 }

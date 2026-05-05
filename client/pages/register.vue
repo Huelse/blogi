@@ -6,16 +6,12 @@ import {
 } from '@heroicons/vue/20/solid'
 import { buttonVariants } from '~/components/ui/button/buttonVariants'
 import type { AuthSession } from '~/types/blogi'
-import { resolveAuthRedirect } from '~/utils/authRedirect'
 import { getErrorMessage } from '~/utils/errors'
-
-definePageMeta({
-  middleware: 'guest',
-})
 
 const route = useRoute()
 const api = useApiClient()
 const auth = useAuth()
+const { navigateAfterAuth } = useAuthNavigation()
 const { t } = useI18n()
 
 const form = reactive({
@@ -41,7 +37,7 @@ async function submit() {
     })
 
     auth.setSession(session)
-    await navigateTo(resolveAuthRedirect(route.query.redirect))
+    await navigateAfterAuth()
   } catch (error) {
     errorMessage.value = getErrorMessage(error, t('common.requestFailed'))
   } finally {

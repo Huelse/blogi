@@ -158,6 +158,7 @@
         "hint": "This content is rendered as trusted HTML. Only save markup that you wrote yourself or have verified as safe. If you clear and save it, the public site stops showing the footer.",
         "label": "HTML template",
         "loadError": "Failed to load footer settings. Make sure the backend is running.",
+        "placeholder": "© 2026 Blogi. Built with Nuxt and Spring Boot.",
         "save": "Save footer settings",
         "saved": "Saved",
         "title": "Footer settings"
